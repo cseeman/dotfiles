@@ -1,0 +1,19 @@
+# Vim temporary files
+*.swp
+*.swo
+*~
+.viminfo
+.netrwhist
+
+# macOS
+.DS_Store
+
+# Neovim plugin directories (managed by plugin managers)
+.config/nvim/plugged/
+.config/nvim/lazy-lock.json
+.config/nvim/plugin/
+
+# Old/backup files
+*.old
+*.backup
+old_*

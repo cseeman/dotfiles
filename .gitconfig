@@ -1,0 +1,65 @@
+# ~/.gitconfig 
+[user]
+	name = Christine Seeman
+	mail = christine.seeman@sofwarellc.com
+	email = christine.seeman@sofwarellc.com
+	signingkey = F5BB5808BF773AFD1BFD0DB996A6EDD21120FC7E
+[alias]
+  st     = status
+  d      = diff
+  co     = checkout
+  can    = commit --amend --no-edit
+  cp     = cherry-pick
+  dm     = diff --patience master
+  b      = branch
+  prb    = pull --rebase
+  pf     = push --force-with-lease
+  pfu    = push --force-with-lease -u origin HEAD    
+  fo     = fetch origin
+  ff     = merge --ff-only
+  noff   = merge --no-ff
+  nocom  = merge --no-commit
+  rip    = rebase --interactive --preserve-merges
+  l      = log --graph --oneline
+  lb     = log --graph --oneline --branches
+  ll     = log --stat
+  lll    = log -p
+  oops   = reset --hard HEAD~1
+  up     = pull --rebase --autostash
+  recent = branch --sort=-committerdate --format=\"%(committerdate:relative)%09%(refname:short)\"
+  remotes = remote -v
+  rhh = reset --hard HEAD
+  rh = reset --hard
+  stashes = stash list
+  unstash = stash pop
+  fixup = commit --fixup
+  wup = log --pretty=format:'%h %cn %cr %s' --graph --since=10.weeks
+  recent = branch --sort=-committerdate --format="%(committerdate:relative)%09%(refname:short)"
+  #Typical Spelling snafu
+  checkou = checkout
+  statsh = stash
+  cop = add -N .; git diff --name-only | xargs rubocop
+	conflicts = diff --name-only --diff-filter=U
+[column]
+        ui = auto
+[commit]
+	gpgsign = true
+	verbose = true
+[core]
+	editor = nvim
+[diff]
+        algorithm = histogram
+        colorMoved = plain
+        mnemonicPrefix = true
+        renames = true
+[fetch]
+        prune = true
+        pruneTags = true
+        all = true
+[help]
+	autocorrect = prompt
+[init]
+	defaultBranch = main
+[pull]
+	rebase = true
+

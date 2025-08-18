@@ -1,0 +1,192 @@
+#!/bin/bash
+
+# Universal Development Session Script
+# Creates a 4-pane tmux layout for any Rails project or worktree
+# Usage: ./dev-session [session-name] [directory]
+
+set -e
+
+# Configuration
+DEFAULT_EDITOR="nvim"
+DEFAULT_PORT="3000"
+
+# Helper functions
+get_current_dir() {
+    pwd
+}
+
+get_project_name() {
+    basename "$(get_current_dir)"
+}
+
+get_branch_name() {
+    if git rev-parse --git-dir > /dev/null 2>&1; then
+        git branch --show-current 2>/dev/null || echo "main"
+    else
+        echo "no-git"
+    fi
+}
+
+generate_session_name() {
+    local project_name=$(get_project_name)
+    local branch_name=$(get_branch_name)
+    
+    # Create meaningful session name
+    if [[ "$branch_name" != "main" && "$branch_name" != "develop" && "$branch_name" != "no-git" ]]; then
+        echo "${project_name}-${branch_name}"
+    else
+        echo "$project_name"
+    fi
+}
+
+is_rails_project() {
+    [[ -f "Gemfile" && -f "config/application.rb" ]]
+}
+
+get_available_port() {
+    # Start checking from default port
+    local port=$DEFAULT_PORT
+    while lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; do
+        ((port++))
+    done
+    echo $port
+}
+
+cleanup_session() {
+    local session_name="$1"
+    echo "Cleaning up session: $session_name"
+    
+    # Try to stop overmind gracefully in each pane
+    for pane in {0..3}; do
+        if tmux list-panes -t "$session_name" 2>/dev/null | grep -q "^$pane:"; then
+            tmux send-keys -t "$session_name:$pane" C-c 2>/dev/null || true
+            sleep 0.5
+            tmux send-keys -t "$session_name:$pane" "overmind stop" C-m 2>/dev/null || true
+        fi
+    done
+    
+    # Wait a moment for graceful shutdown
+    sleep 2
+    
+    # Force kill any remaining overmind processes
+    pkill -f "overmind" 2>/dev/null || true
+}
+
+# Parse arguments
+SESSION_NAME="${1:-$(generate_session_name)}"
+WORK_DIR="${2:-$(get_current_dir)}"
+
+# Set up cleanup trap
+trap "cleanup_session '$SESSION_NAME'" EXIT INT TERM
+
+# Validate directory exists
+if [[ ! -d "$WORK_DIR" ]]; then
+    echo "Error: Directory $WORK_DIR does not exist"
+    exit 1
+fi
+
+echo "Setting up development session: $SESSION_NAME"
+echo "Working directory: $WORK_DIR"
+
+# Check if session already exists
+if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+    echo "Session '$SESSION_NAME' already exists. Attaching..."
+    tmux attach-session -t "$SESSION_NAME"
+    exit 0
+fi
+
+# Create new session
+echo "Creating new tmux session..."
+tmux new-session -d -s "$SESSION_NAME" -c "$WORK_DIR"
+
+# Split into 4 panes with explicit layout
+echo "Setting up 4-pane layout..."
+
+# Create a clean 2x2 grid layout step by step
+# Start with horizontal split (left|right)
+tmux split-window -h -c "$WORK_DIR"              # Creates pane 1 (right side)
+
+# Split left pane vertically (creates top-left, bottom-left)
+tmux select-pane -t 0                            # Select left pane
+tmux split-window -v -c "$WORK_DIR"              # Creates pane 2 (bottom-left)
+
+# Split right pane vertically (creates top-right, bottom-right)  
+tmux select-pane -t 1                            # Select right pane (now at index 1)
+tmux split-window -v -c "$WORK_DIR"              # Creates pane 3 (bottom-right)
+
+# Apply a consistent 2x2 layout with equal-sized quadrants
+tmux select-layout tiled
+
+# After splits: 0=top-left, 1=top-right, 2=bottom-left, 3=bottom-right
+echo "Configuring panes..."
+
+# Pane 0: Top-left = Neovim
+tmux send-keys -t 0 "$DEFAULT_EDITOR" C-m
+
+# Pane 1: Top-right = Claude Code  
+echo "Starting Claude Code..."
+tmux send-keys -t 1 "claude" C-m
+
+# Pane 2: Bottom-left = Rails server
+if is_rails_project; then
+    port=$(get_available_port)
+    echo "Starting Rails server on port $port..."
+    # Set up overmind with proper cleanup handling
+    tmux send-keys -t 2 "echo 'Setting up Rails development server...'" C-m
+    tmux send-keys -t 2 "trap 'echo \"Stopping overmind...\"; overmind stop; exit' INT TERM EXIT" C-m
+    tmux send-keys -t 2 "bin/dev" C-m
+else
+    echo "Not a Rails project, opening shell in pane 2"
+    tmux send-keys -t 2 "echo 'Ready for commands'" C-m
+fi
+
+# Pane 3: Bottom-right = Git commands with lazygit
+if git rev-parse --git-dir > /dev/null 2>&1; then
+    # Check if lazygit is installed
+    if command -v lazygit &> /dev/null; then
+        tmux send-keys -t 3 "lazygit" C-m
+    else
+        echo "lazygit not found, using regular git"
+        tmux send-keys -t 3 "git status" C-m
+        tmux send-keys -t 3 "# Install lazygit: brew install lazygit" C-m
+    fi
+else
+    tmux send-keys -t 3 "# No git repository detected" C-m
+fi
+
+# Select the editor pane to start
+tmux select-pane -t 0
+
+# Set up window and session display
+tmux rename-window "dev"
+
+# Configure status line to show session name prominently
+tmux set-option -t "$SESSION_NAME" status-left "#[fg=green,bold]#S #[default]"
+tmux set-option -t "$SESSION_NAME" status-left-length 50
+tmux set-option -t "$SESSION_NAME" status-right-length 50
+
+echo "✓ Development session ready!"
+echo "Session: $SESSION_NAME"
+if is_rails_project; then
+    port=$(get_available_port)
+    echo "Rails server: http://localhost:$port"
+fi
+echo ""
+echo "Layout:"
+echo "┌─────────────────┬─────────────────┐"
+echo "│ nvim            │ claude          │"
+echo "├─────────────────┼─────────────────┤"
+echo "│ rails server    │ lazygit         │"
+echo "└─────────────────┴─────────────────┘"
+echo ""
+echo "💡 Tips:"
+echo "  • Navigate panes: Ctrl-b + arrow keys"
+echo "  • Lazygit: ? for help, W for worktrees, space to stage, c to commit"
+echo "  • Exit cleanly: Ctrl-C in rails pane, then 'tmux kill-session -t $SESSION_NAME'"
+echo "  • Or use: 'exit' in each pane, then detach with Ctrl-b d"
+echo "  • Overmind cleanup is automatic when exiting properly"
+echo ""
+echo "Attaching to session..."
+
+# Attach to the session
+tmux attach-session -t "$SESSION_NAME"
