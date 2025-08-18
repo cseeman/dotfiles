@@ -4,11 +4,11 @@
 
 ```
 ┌─────────────────────────┬─────────────────────────┐
-│ Pane 1: Neovim         │ Pane 2: Rails server    │
-│ (editing code)          │ (watching logs)         │
+│ Pane 1: Neovim         │ Pane 2: Claude Code     │
+│ (editing code)          │ (AI assistance, help)   │
 ├─────────────────────────┼─────────────────────────┤
-│ Pane 3: Git/Tests      │ Pane 4: Claude Code     │
-│ (git st, rspec)        │ (complex tasks, help)   │
+│ Pane 3: Rails server   │ Pane 4: lazygit/Git     │
+│ (Overmind/logs)        │ (version control)       │
 └─────────────────────────┴─────────────────────────┘
 ```
 
@@ -28,9 +28,9 @@ Ctrl-b %    # Split vertically (bottom)
 
 # Navigate and set up each pane:
 # Pane 1 (top-left): nvim
-# Pane 2 (top-right): rails s -p 3001
-# Pane 3 (bottom-left): git status
-# Pane 4 (bottom-right): claude
+# Pane 2 (top-right): claude
+# Pane 3 (bottom-left): ./bin/dev (Overmind) or rails s
+# Pane 4 (bottom-right): lazygit or git status
 ```
 
 ### Using dev-session Script
@@ -40,6 +40,29 @@ chmod +x ~/Documents/Repos/dev_scripts/dev-session
 
 # Run the script
 ~/Documents/Repos/dev_scripts/dev-session
+```
+
+## Rails Server Setup
+
+### Using Overmind (Recommended)
+```bash
+# If your project has a bin/dev script for Overmind
+./bin/dev
+
+# This typically runs multiple processes:
+# - Rails server
+# - Webpack/esbuild/vite dev server
+# - CSS watching/building
+# - Background job processors (Sidekiq/Que)
+```
+
+### Alternative: Plain Rails Server
+```bash
+# Simple Rails server (if not using Overmind)
+rails s -p 3000
+
+# Or with specific port if default is in use
+rails s -p 3001
 ```
 
 ## Git Worktree Workflow
@@ -119,17 +142,17 @@ set -g mouse on
 
 ### Pane Responsibilities
 1. **Neovim (Pane 1)** - Primary editing, stay in flow state
-2. **Rails Server (Pane 2)** - Monitor logs, see real-time feedback
-3. **Git/Tests (Pane 3)** - Quick commands: `git st`, `rspec`, `git pf`
-4. **Claude Code (Pane 4)** - AI assistance without context switching
+2. **Claude Code (Pane 2)** - AI assistance without context switching
+3. **Rails Server (Pane 3)** - Monitor logs via Overmind (./bin/dev) or rails server
+4. **lazygit/Git (Pane 4)** - Visual Git operations or command-line Git
 
 ### Workflow Pattern
 ```bash
 # 1. Start in Neovim pane - edit code
-# 2. Ctrl-b → to Rails pane - check server response
-# 3. Ctrl-b ↓ ← to Git pane - run tests: bundle exec rspec
-# 4. Ctrl-b → to Claude pane - ask for help with failures
-# 5. Ctrl-b ← ↑ back to Neovim - implement fixes
+# 2. Ctrl-b → to Claude pane - get AI assistance
+# 3. Ctrl-b ↓ ← to Rails pane - check server logs/response
+# 4. Ctrl-b → to Git pane - commit changes with lazygit
+# 5. Ctrl-b ↑ ← back to Neovim - continue development
 ```
 
 ## Claude Code Integration Tips
