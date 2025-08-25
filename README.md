@@ -20,10 +20,13 @@ I'm a firm believer that your development environment should get out of your way
 
 ## What's Inside
 
-### 🐚 Shell Stuff
+### 🐚 Shell & Terminal Styling
 - `.bashrc` & `.bash_profile` - Because yes, I still use bash sometimes
 - `.zshrc` - The minimal zsh config (because sometimes I do reach for zsh)
-- Starship prompt that actually tells me useful things, and it is so pretty
+- **Starship prompt** - Three beautiful themes that match tmux perfectly
+  - 🌃 **Tokyo Night** - Modern blue/purple (default)
+  - 🌙 **Catppuccin Mocha** - Soft pastels
+  - 🌰 **Gruvbox** - Classic warm earth tones
 
 ### 💎 Ruby/Rails Tooling
 - `.tool-versions` - asdf keeping my Ruby versions in check
@@ -33,6 +36,14 @@ I'm a firm believer that your development environment should get out of your way
 - `.config/nvim/init.lua` - My Lua config (finally migrated from Vimscript!)
 - Still using vim-plug because it works and I'm stubborn
 - Gruvbox theme because my eyes deserve nice things
+
+### 🖥️ Tmux Setup
+- **`.config/tmux/`** - Complete modular tmux configuration
+  - Three coordinated themes matching Starship
+  - Enhanced copy/paste with proper vim bindings
+  - Smart pane borders with status indicators
+  - Theme switching on-the-fly
+- **Fixed reload functionality** (no more "file not found" errors!)
 
 ### 🤖 AI Integration Scripts
 - `dev-scripts/` - Where the magic happens
@@ -62,13 +73,30 @@ Why? Because context switching kills flow. This setup lets me code, ask question
 
 ## Quick Start
 
+### 🚀 Full Setup (Recommended)
 ```bash
-# Clone this repo
+# Clone this repo (if you haven't already)
 git clone <your-repo-url> ~/Documents/Repos/dotfiles
 
-# Symlink what you need (or be brave and symlink everything)
+# Run the theme installer for the complete modern experience
+./install-themes.sh
+
+# Restart your shell to see Starship changes
+exec $SHELL
+```
+
+### 🔧 Manual Installation (Pick and Choose)
+```bash
+# Modern tmux + themes (replaces old .tmux.conf)
+ln -sf ~/Documents/Repos/dotfiles/.config/tmux ~/.config/tmux
+
+# Starship themes
+ln -sf ~/Documents/Repos/dotfiles/.config/starship.toml ~/.config/starship.toml
+
+# Neovim config
 ln -sf ~/Documents/Repos/dotfiles/.config/nvim ~/.config/nvim
-ln -sf ~/Documents/Repos/dotfiles/.tmux.conf ~/.tmux.conf
+
+# Git configuration  
 ln -sf ~/Documents/Repos/dotfiles/.gitconfig ~/.gitconfig
 
 # Make the dev-session script available
@@ -78,6 +106,10 @@ ln -sf ~/Documents/Repos/dotfiles/dev-scripts/dev-session ~/bin/dev-session
 ## The Evolution
 
 This is a living repository. As I discover new tools, refine my workflow, or finally fix that annoying thing that's been bugging me for months, these configs evolve. Recent additions include:
+- **Theme Switching System** (August 2025) - Three coordinated themes across tmux and Starship
+- **Enhanced Copy/Paste** - Fixed vim bindings that actually work with macOS
+- **Modular tmux Config** - Clean, organized, and easily maintainable
+- **Smart Git Branch Display** - No more truncated branch names (up to 35 chars!)
 - Claude integration that actually helps rather than hinders
 - Overmind setup for managing Rails processes without losing my mind
 - lazygit because sometimes GUIs are okay (don't @ me)

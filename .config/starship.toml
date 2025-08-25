@@ -1,0 +1,262 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Modern Tokyo Night inspired prompt matching tmux theme
+# Clean, readable, and flexible
+
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$git_metrics\
+$nodejs\
+$python\
+$ruby\
+$rust\
+$golang\
+$java\
+$docker_context\
+$kubernetes\
+$aws\
+$gcloud\
+$cmd_duration\
+$jobs\
+$battery\
+$time\
+$line_break\
+$character"""
+
+# Use Tokyo Night palette by default
+palette = 'tokyo_night'
+
+[palettes.tokyo_night]
+# Tokyo Night Storm colors matching tmux theme
+bg = "#1a1b26"
+bg_dark = "#16161e"
+bg_highlight = "#292e42"
+fg = "#c0caf5"
+fg_dark = "#a9b1d6"
+blue = "#7aa2f7"
+cyan = "#7dcfff"
+magenta = "#bb9af7"
+purple = "#9d7cd8"
+green = "#9ece6a"
+yellow = "#e0af68"
+orange = "#ff9e64"
+red = "#f7768e"
+gray = "#565f89"
+gray_dark = "#414868"
+
+[palettes.catppuccin_mocha]
+# Catppuccin Mocha colors matching alternative tmux theme
+base = "#1e1e2e"
+mantle = "#181825"
+surface0 = "#313244"
+surface1 = "#45475a"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+lavender = "#b4befe"
+blue = "#89b4fa"
+sapphire = "#74c7ec"
+sky = "#89dceb"
+teal = "#94e2d5"
+green = "#a6e3a1"
+yellow = "#f9e2af"
+peach = "#fab387"
+red = "#f38ba8"
+mauve = "#cba6f7"
+pink = "#f5c2e7"
+
+# Username - only show when SSH or root
+[username]
+style_user = "bold fg:cyan"
+style_root = "bold fg:red"
+format = "[$user]($style) "
+disabled = false
+show_always = false
+
+# Hostname - only show when SSH
+[hostname]
+ssh_only = true
+format = "on [$hostname](bold fg:yellow) "
+disabled = false
+
+# Directory with icons and smart truncation
+[directory]
+style = "bold fg:blue"
+format = "[$path]($style)[$read_only]($read_only_style) "
+truncation_length = 5
+truncation_symbol = "…/"
+read_only = "󰌾"
+read_only_style = "fg:red"
+
+[directory.substitutions]
+"Documents" = "󰈙 Documents"
+"Downloads" = " Downloads"
+"Music" = "󰝚 Music"
+"Pictures" = " Pictures"
+"Videos" = " Videos"
+"Desktop" = " Desktop"
+"Applications" = " Applications"
+"Developer" = "󰲋 Developer"
+"Projects" = " Projects"
+"Repos" = " Repos"
+".config" = " Config"
+"node_modules" = " node_modules"
+
+# Git branch with clean styling
+[git_branch]
+symbol = " "
+style = "fg:purple"
+format = "[$symbol$branch]($style) "
+truncation_length = 35
+truncation_symbol = "…"
+
+# Git status with meaningful icons
+[git_status]
+style = "fg:red"
+format = "([$all_status$ahead_behind]($style))"
+conflicted = "󰞇 "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇕⇡${ahead_count}⇣${behind_count} "
+up_to_date = ""
+untracked = "? "
+stashed = "󰏗 "
+modified = "! "
+staged = "+ "
+renamed = "» "
+deleted = "✘ "
+
+# Git metrics (optional, can be disabled)
+[git_metrics]
+added_style = "fg:green"
+deleted_style = "fg:red"
+only_nonzero_diffs = true
+format = '([+$added]($added_style) )([-$deleted]($deleted_style) )'
+disabled = false
+
+# Language and tool indicators
+[nodejs]
+symbol = "󰎙 "
+style = "fg:green"
+format = "[$symbol($version)]($style) "
+detect_extensions = ["js", "mjs", "cjs", "ts", "tsx"]
+
+[python]
+symbol = "󰌠 "
+style = "fg:yellow"
+format = "[$symbol($version)]($style) "
+
+[ruby]
+symbol = "󰴭 "
+style = "fg:red"
+format = "[$symbol($version)]($style) "
+
+[rust]
+symbol = "󱘗 "
+style = "fg:orange"
+format = "[$symbol($version)]($style) "
+
+[golang]
+symbol = "󰟓 "
+style = "fg:cyan"
+format = "[$symbol($version)]($style) "
+
+[java]
+symbol = "󰬷 "
+style = "fg:red"
+format = "[$symbol($version)]($style) "
+
+# Infrastructure tools
+[docker_context]
+symbol = "󰡨 "
+style = "fg:blue"
+format = "[$symbol$context]($style) "
+only_with_files = true
+
+[kubernetes]
+symbol = "󱃾 "
+style = "fg:blue"
+format = "[$symbol$context( \\($namespace\\))]($style) "
+disabled = false
+
+[aws]
+symbol = "󰸏 "
+style = "fg:orange"
+format = "[$symbol($profile )(\\($region\\) )]($style)"
+
+[gcloud]
+symbol = "󱇶 "
+style = "fg:blue"
+format = "[$symbol$account(@$domain)(\\($region\\))]($style) "
+
+# Performance and system info
+[cmd_duration]
+min_time = 2_000
+style = "fg:gray"
+format = "took [$duration]($style) "
+
+[jobs]
+symbol = "󰔟 "
+style = "fg:yellow"
+format = "[$symbol$number]($style) "
+
+[battery]
+full_symbol = "󰁹 "
+charging_symbol = "󰂄 "
+discharging_symbol = "󰂃 "
+unknown_symbol = "󰁽 "
+empty_symbol = "󰂎 "
+
+[[battery.display]]
+threshold = 20
+style = "fg:red"
+
+[[battery.display]]
+threshold = 50
+style = "fg:yellow"
+
+# Time (optional)
+[time]
+disabled = true  # Enable if you want time in prompt
+time_format = "%H:%M"
+style = "fg:gray"
+format = "[$time]($style) "
+
+# Line break for readability
+[line_break]
+disabled = false
+
+# Command character with vim mode support
+[character]
+success_symbol = "[❯](bold fg:green)"
+error_symbol = "[❯](bold fg:red)"
+vimcmd_symbol = "[❮](bold fg:green)"
+vimcmd_replace_one_symbol = "[❮](bold fg:purple)"
+vimcmd_replace_symbol = "[❮](bold fg:purple)"
+vimcmd_visual_symbol = "[❮](bold fg:yellow)"
+
+# Custom modules for additional functionality
+[custom.git_server]
+command = """
+URL=$(command git config --get remote.origin.url 2>/dev/null)
+if [[ "$URL" =~ github.com ]]; then echo " "
+elif [[ "$URL" =~ gitlab.com ]]; then echo " "
+elif [[ "$URL" =~ bitbucket.org ]]; then echo " "
+else echo "󰊢 "; fi
+"""
+when = 'git rev-parse --is-inside-work-tree 2>/dev/null'
+style = "fg:purple"
+format = "[$output]($style)"
+disabled = true  # Enable if you want git server icons
+
+# Shell indicators
+[shell]
+fish_indicator = ""
+powershell_indicator = "_"
+unknown_indicator = "?"
+style = "fg:gray"
+disabled = true
