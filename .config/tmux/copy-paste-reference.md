@@ -40,6 +40,13 @@ If copying isn't working:
 2. Try reloading config: `Ctrl-t r` (or manually: `tmux source-file ~/.config/tmux/.brandnew_setup_tmux.conf`)
 3. Check if pbcopy works: `echo "test" | pbcopy` then `pbpaste`
 
+## Pane Visibility Features
+
+- **Active Pane:** Brighter background and bold blue border
+- **Inactive Panes:** Dimmed with subtle gray borders
+- **Pane Indicators:** `●` for active pane, `○` for inactive
+- **Pane Numbers:** Press `Ctrl-t q` to display pane numbers (2 seconds)
+
 ## Advanced Tips
 
 - **Search in Copy Mode:** `/` (forward) or `?` (backward)
