@@ -61,7 +61,7 @@ switch_theme() {
     ln -sf "$theme_file" "$CURRENT_THEME_LINK"
     
     # Reload tmux config
-    tmux source-file "$TMUX_CONFIG_DIR/.brandnew_setup_tmux.conf" 2>/dev/null
+    tmux source-file "$TMUX_CONFIG_DIR/tmux.conf" 2>/dev/null
     
     echo "✨ Switched to '$theme_name' theme"
     echo "   Theme will be applied to all tmux sessions"
