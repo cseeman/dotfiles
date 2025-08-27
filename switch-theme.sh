@@ -21,6 +21,11 @@ switch_unified_theme() {
             "$SCRIPT_DIR/tmux/switch-theme.sh" catppuccin 2>/dev/null || echo "   tmux: theme not found"
             "$SCRIPT_DIR/switch-starship-theme.sh" catppuccin || echo "   starship: theme not found"
             ;;
+        latte|light)
+            echo "☀️ Switching to Catppuccin Latte (light) theme..."
+            "$SCRIPT_DIR/tmux/switch-theme.sh" latte 2>/dev/null || echo "   tmux: theme not found"
+            "$SCRIPT_DIR/switch-starship-theme.sh" latte || echo "   starship: theme not found"
+            ;;
         gruvbox)
             echo "🌰 Switching to Gruvbox theme..."
             "$SCRIPT_DIR/tmux/switch-theme.sh" original 2>/dev/null || echo "   tmux: theme not found"
@@ -28,8 +33,9 @@ switch_unified_theme() {
             ;;
         *)
             echo "Available themes:"
-            echo "  tokyo      - Tokyo Night (blue/purple)"
-            echo "  catppuccin - Catppuccin Mocha (soft pastels)"  
+            echo "  tokyo      - Tokyo Night (blue/purple dark)"
+            echo "  catppuccin - Catppuccin Mocha (soft pastels dark)"
+            echo "  latte      - Catppuccin Latte (soft pastels light)"  
             echo "  gruvbox    - Gruvbox (warm earth tones)"
             echo ""
             echo "Usage: $0 <theme-name>"

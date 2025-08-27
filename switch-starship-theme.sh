@@ -11,6 +11,7 @@ get_theme_file() {
     case "$1" in
         tokyo) echo "starship.toml" ;;
         catppuccin) echo "starship-catppuccin.toml" ;;
+        latte) echo "starship-catppuccin-latte.toml" ;;
         gruvbox) echo "starship-gruvbox-backup.toml" ;;
         *) echo "" ;;
     esac
@@ -19,7 +20,7 @@ get_theme_file() {
 # Function to list available themes
 list_themes() {
     echo "Available Starship themes:"
-    for name in tokyo catppuccin gruvbox; do
+    for name in tokyo catppuccin latte gruvbox; do
         theme_file=$(get_theme_file "$name")
         if [[ -f "$STARSHIP_CONFIG_DIR/$theme_file" ]]; then
             # Simple check - see if this theme is currently active
@@ -31,6 +32,12 @@ list_themes() {
                 fi
             elif [[ "$name" == "catppuccin" ]]; then
                 if grep -q "palette = 'catppuccin_mocha'" "$CURRENT_CONFIG" 2>/dev/null; then
+                    echo "  * $name (current)"
+                else
+                    echo "    $name"
+                fi
+            elif [[ "$name" == "latte" ]]; then
+                if grep -q "palette = 'catppuccin_latte'" "$CURRENT_CONFIG" 2>/dev/null; then
                     echo "  * $name (current)"
                 else
                     echo "    $name"

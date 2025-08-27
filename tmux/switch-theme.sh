@@ -12,6 +12,7 @@ get_theme_file() {
     case "$1" in
         tokyo) echo "theme-tokyo.conf" ;;
         catppuccin) echo "theme-catppuccin.conf" ;;
+        latte) echo "theme-catppuccin-latte.conf" ;;
         original) echo "theme-original.conf" ;;
         *) echo "" ;;
     esac
@@ -20,7 +21,7 @@ get_theme_file() {
 # Function to list available themes
 list_themes() {
     echo "Available themes:"
-    for name in tokyo catppuccin original; do
+    for name in tokyo catppuccin latte original; do
         theme_file=$(get_theme_file "$name")
         if [[ -f "$THEME_DIR/$theme_file" ]]; then
             if [[ "$CURRENT_THEME_LINK" -ef "$THEME_DIR/$theme_file" ]]; then

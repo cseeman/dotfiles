@@ -1,0 +1,37 @@
+[general]
+import = [
+    "~/.config/alacritty/themes/themes/carbonfox.toml"
+]
+
+[env]
+TERM = "xterm-256color"
+
+[window]
+startup_mode = "Fullscreen"
+decorations = "None"
+opacity = 0.7
+padding = { x = 16 , y = 16 }
+
+[font]
+# Monaspace has 5 variants - try different ones:
+# MonaspaceArgon - Clean, minimal
+# MonaspaceNeon - Editorial, prose-friendly  
+# MonaspaceXenon - Wide, generous spacing
+# MonaspaceRadon - Handwriting-inspired
+# MonaspaceKrypton - Mechanical, technical
+
+normal = { family = "MonaspaceNeon Nerd Font", style = "Regular" }
+bold = { family = "MonaspaceNeon Nerd Font", style = "Bold" }
+italic = { family = "MonaspaceRadon Nerd Font", style = "Italic" }  # Mix for stylistic italics!
+bold_italic = { family = "MonaspaceNeon Nerd Font", style = "Bold Italic" }
+
+size = 14
+
+# Monaspace benefits from these settings
+[font.offset]
+x = 0
+y = 0
+
+[terminal.shell]
+program = "/bin/bash"
+args = ["-l"]
