@@ -124,10 +124,10 @@ set -g mouse on
 ## Development Flow
 
 ### Pane Responsibilities
-1. **Neovim (Pane 0)** - Primary editing
-2. **Claude Code (Pane 1)** - AI assistance without context switching
-3. **Git/Tests (Pane 2)** - Quick commands: `git st`, `rspec`, `git pf`, `lazygit`
-4. **Rails Server (Pane 3)** - Monitor logs with `bin/dev`
+1. Neovim (Pane 0) - Primary editing
+2. Claude Code (Pane 1) - AI assistance without context switching
+3. Git/Tests (Pane 2) - Quick commands: `git st`, `rspec`, `git pf`, `lazygit`
+4. Rails Server (Pane 3) - Monitor logs with `bin/dev`
 
 ### Workflow Pattern
 ```bash
@@ -141,15 +141,13 @@ set -g mouse on
 ## Claude Code Integration
 
 ### Useful Commands
-- **"Show me where X is implemented"** - Get file:line references
-- **"Find all places that use Y"** - Search and analyze codebase
-- **"Write RSpec tests for this feature"** - Generate tests
-- **"Following this app's patterns, implement..."** - Get convention-aware code
+- "Show me where X is implemented" - Get file:line references
+- "Find all places that use Y" - Search and analyze codebase
+- "Write RSpec tests for this feature" - Generate tests
+- "Following this app's patterns, implement..." - Get convention-aware code
 
 ### Working with Context
-- Claude remembers git state, recent edits, and preferences
-- Reference earlier work: "that test we just wrote"
-- Share your conventions early: commit styles, code patterns, git aliases
+Claude remembers git state, recent edits, and preferences. Reference earlier work ("that test we just wrote") and share conventions early: commit styles, code patterns, git aliases.
 
 ## Git Aliases
 
@@ -164,17 +162,9 @@ git up      # pull --rebase --autostash
 ## Tips
 
 ### Session Persistence
-- Sessions survive sleep/wake cycles
-- Detach with `Ctrl-b d`, reattach anytime
-- Works well for multi-day feature development
+Sessions survive sleep/wake cycles. Detach with `Ctrl-b d` and reattach anytime.
 
 ### Pane Management
 - Use `Ctrl-b z` to zoom when reading longer Claude responses
-- Resize panes based on current task needs
+- Resize panes based on current task
 - Create multiple windows for different work (feature vs debugging)
-
-### Why This Layout Works
-- No context switching between tools
-- Keep flow state while getting AI help
-- See feedback from all tools at once
-- Fast iteration: edit → test → commit → ask Claude
