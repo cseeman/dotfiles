@@ -1,14 +1,14 @@
 # Development Workflow with Tmux + Claude Code
 
-## Optimal 4-Pane Tmux Layout
+## 4-Pane Tmux Layout
 
 ```
 ┌─────────────────────────┬─────────────────────────┐
-│ Pane 1: Neovim         │ Pane 2: Claude Code     │
-│ (editing code)          │ (AI assistance, help)   │
+│ Pane 0: Neovim         │ Pane 1: Claude Code     │
+│ (editing code)          │ (AI assistance)         │
 ├─────────────────────────┼─────────────────────────┤
-│ Pane 3: Rails server   │ Pane 4: lazygit/Git     │
-│ (Overmind/logs)        │ (version control)       │
+│ Pane 2: Git/Tests      │ Pane 3: Rails server    │
+│ (git st, lazygit)      │ (bin/dev, watching logs)│
 └─────────────────────────┴─────────────────────────┘
 ```
 
@@ -27,42 +27,25 @@ Ctrl-b j    # Move to bottom pane
 Ctrl-b %    # Split vertically (bottom)
 
 # Navigate and set up each pane:
-# Pane 1 (top-left): nvim
-# Pane 2 (top-right): claude
-# Pane 3 (bottom-left): ./bin/dev (Overmind) or rails s
-# Pane 4 (bottom-right): lazygit or git status
+# Pane 0 (top-left): nvim
+# Pane 1 (top-right): claude
+# Pane 2 (bottom-left): git status / lazygit
+# Pane 3 (bottom-right): bin/dev
 ```
 
 ### Using dev-session Script
 ```bash
-# Make executable if needed
-chmod +x ~/Documents/Repos/dev_scripts/dev-session
+# Add alias to ~/.bashrc (already configured)
+alias dev="/Users/christine/Documents/Repos/dev_scripts/dev-session"
 
-# Run the script
-~/Documents/Repos/dev_scripts/dev-session
-```
+# Usage: cd to your Rails project, then run:
+dev
 
-## Rails Server Setup
+# Or with custom session name:
+dev my-session-name
 
-### Using Overmind (Recommended)
-```bash
-# If your project has a bin/dev script for Overmind
-./bin/dev
-
-# This typically runs multiple processes:
-# - Rails server
-# - Webpack/esbuild/vite dev server
-# - CSS watching/building
-# - Background job processors (Sidekiq/Que)
-```
-
-### Alternative: Plain Rails Server
-```bash
-# Simple Rails server (if not using Overmind)
-rails s -p 3000
-
-# Or with specific port if default is in use
-rails s -p 3001
+# Or with specific directory:
+dev session-name /path/to/project
 ```
 
 ## Git Worktree Workflow
@@ -111,7 +94,7 @@ Ctrl-b d
 tmux kill-session -t session-name
 ```
 
-## Recommended ~/.tmux.conf Settings
+## ~/.tmux.conf Settings
 
 ```bash
 # Better pane navigation (Vim-like)
@@ -138,39 +121,39 @@ setw -g pane-base-index 1
 set -g mouse on
 ```
 
-## Development Flow Benefits
+## Development Flow
 
 ### Pane Responsibilities
-1. **Neovim (Pane 1)** - Primary editing, stay in flow state
-2. **Claude Code (Pane 2)** - AI assistance without context switching
-3. **Rails Server (Pane 3)** - Monitor logs via Overmind (./bin/dev) or rails server
-4. **lazygit/Git (Pane 4)** - Visual Git operations or command-line Git
+1. **Neovim (Pane 0)** - Primary editing
+2. **Claude Code (Pane 1)** - AI assistance without context switching
+3. **Git/Tests (Pane 2)** - Quick commands: `git st`, `rspec`, `git pf`, `lazygit`
+4. **Rails Server (Pane 3)** - Monitor logs with `bin/dev`
 
 ### Workflow Pattern
 ```bash
-# 1. Start in Neovim pane - edit code
-# 2. Ctrl-b → to Claude pane - get AI assistance
-# 3. Ctrl-b ↓ ← to Rails pane - check server logs/response
-# 4. Ctrl-b → to Git pane - commit changes with lazygit
-# 5. Ctrl-b ↑ ← back to Neovim - continue development
+# 1. Start in Neovim pane (0) - edit code
+# 2. Ctrl-b → to Claude pane (1) - ask for help or generate code
+# 3. Ctrl-b ↓ to Rails pane (3) - check server response
+# 4. Ctrl-b ← to Git pane (2) - run tests: bundle exec rspec, commit changes
+# 5. Ctrl-b ↑ back to Neovim - implement fixes and continue
 ```
 
-## Claude Code Integration Tips
+## Claude Code Integration
 
-### Effective Commands
+### Useful Commands
 - **"Show me where X is implemented"** - Get file:line references
-- **"Find all places that use Y"** - Codebase search and analysis
-- **"Write RSpec tests for this feature"** - Test generation
-- **"Following this app's patterns, implement..."** - Convention-aware code
+- **"Find all places that use Y"** - Search and analyze codebase
+- **"Write RSpec tests for this feature"** - Generate tests
+- **"Following this app's patterns, implement..."** - Get convention-aware code
 
-### Context Maintenance
-- Claude remembers your git state, recent edits, and preferences
-- Reference previous work: "that test we just wrote"
-- Share preferences early: commit styles, code patterns, git aliases
+### Working with Context
+- Claude remembers git state, recent edits, and preferences
+- Reference earlier work: "that test we just wrote"
+- Share your conventions early: commit styles, code patterns, git aliases
 
-## Git Aliases Integration
+## Git Aliases
 
-Your preferred aliases work seamlessly:
+The workflow supports your git aliases:
 ```bash
 git st      # status
 git pf      # push --force-with-lease
@@ -178,24 +161,20 @@ git can     # commit --amend --no-edit
 git up      # pull --rebase --autostash
 ```
 
-## Pro Tips
+## Tips
 
 ### Session Persistence
-- Sessions survive computer sleep/wake
+- Sessions survive sleep/wake cycles
 - Detach with `Ctrl-b d`, reattach anytime
-- Perfect for multi-day feature development
+- Works well for multi-day feature development
 
 ### Pane Management
-- Use `Ctrl-b z` to focus on complex Claude explanations
-- Resize panes based on current task (more space for tests vs editing)
-- Create multiple windows for different aspects (feature vs debugging)
+- Use `Ctrl-b z` to zoom when reading longer Claude responses
+- Resize panes based on current task needs
+- Create multiple windows for different work (feature vs debugging)
 
-### Integration Benefits
+### Why This Layout Works
 - No context switching between tools
-- Maintain flow state while getting AI assistance  
-- Visual feedback from all development aspects simultaneously
-- Quick iteration cycles: edit → test → commit → ask Claude
-
----
-
-*This workflow optimizes for developer flow state while maximizing the benefits of AI-assisted development.*
+- Keep flow state while getting AI help
+- See feedback from all tools at once
+- Fast iteration: edit → test → commit → ask Claude
