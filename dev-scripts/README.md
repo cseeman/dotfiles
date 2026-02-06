@@ -1,16 +1,23 @@
 # Development Workflow with Tmux + Claude Code
 
-## 4-Pane Tmux Layout
+## Layout
+
+Claude Code handles editing, git, tests, and server management directly, so
+dedicated panes for each are no longer needed. The current layout pairs a shell
+with Claude side by side:
 
 ```
 ┌─────────────────────────┬─────────────────────────┐
-│ Pane 0: Neovim         │ Pane 1: Claude Code     │
-│ (editing code)          │ (AI assistance)         │
-├─────────────────────────┼─────────────────────────┤
-│ Pane 2: Git/Tests      │ Pane 3: Rails server    │
-│ (git st, lazygit)      │ (bin/dev, watching logs)│
+│                         │                         │
+│   Shell                 │   Claude Code           │
+│   (commands, server)    │   (AI pair programmer)  │
+│                         │                         │
 └─────────────────────────┴─────────────────────────┘
 ```
+
+The shell pane is for anything you need hands-on control over (running a
+server, quick one-off commands). Claude handles the rest: file editing, git
+operations, test runs, and codebase exploration.
 
 ## Quick Setup Commands
 
@@ -19,33 +26,26 @@
 # Create session
 tmux new-session -s feature-name
 
-# Split into 4 panes
-Ctrl-b "    # Split horizontally
-Ctrl-b k    # Move to top pane
-Ctrl-b %    # Split vertically (top)
-Ctrl-b j    # Move to bottom pane  
-Ctrl-b %    # Split vertically (bottom)
+# Split vertically (side by side)
+Ctrl-t |    # Split into left and right panes
 
-# Navigate and set up each pane:
-# Pane 0 (top-left): nvim
-# Pane 1 (top-right): claude
-# Pane 2 (bottom-left): git status / lazygit
-# Pane 3 (bottom-right): bin/dev
+# Left pane: shell (ready for commands)
+# Right pane: claude
 ```
 
 ### Using dev-session Script
 ```bash
-# Add alias to ~/.bashrc (already configured)
-alias dev="/Users/christine/Documents/Repos/dev_scripts/dev-session"
+# Symlink into your PATH (already configured)
+ln -sf ~/Documents/Repos/dotfiles/dev-scripts/dev-session ~/bin/dev-session
 
-# Usage: cd to your Rails project, then run:
-dev
+# Usage: cd to your project, then run:
+dev-session
 
 # Or with custom session name:
-dev my-session-name
+dev-session my-session-name
 
 # Or with specific directory:
-dev session-name /path/to/project
+dev-session session-name /path/to/project
 ```
 
 ## Git Worktree Workflow
@@ -73,11 +73,11 @@ git worktree add ../qualify-event-factory christine/add-event-factory
 ## Essential Tmux Commands
 
 ### Navigation
-- `Ctrl-b h/j/k/l` - Navigate panes (if configured)
-- `Ctrl-b ←/↓/↑/→` - Navigate panes (default)
-- `Ctrl-b z` - Toggle pane fullscreen
-- `Ctrl-b c` - New window
-- `Ctrl-b 1,2,3,4` - Switch windows
+- `Ctrl-t h/j/k/l` - Navigate panes (vim-style)
+- `Ctrl-h/j/k/l` - Navigate panes (vim-tmux-navigator)
+- `Ctrl-t z` - Toggle pane fullscreen
+- `Ctrl-t c` - New window
+- `Ctrl-t 1,2,3,4` - Switch windows
 
 ### Session Management
 ```bash
@@ -88,66 +88,46 @@ tmux list-sessions
 tmux attach-session -t session-name
 
 # Detach (keeps running)
-Ctrl-b d
+Ctrl-t d
 
 # Kill session
 tmux kill-session -t session-name
 ```
 
-## ~/.tmux.conf Settings
+## Tmux Configuration
 
-```bash
-# Better pane navigation (Vim-like)
-bind h select-pane -L
-bind j select-pane -D
-bind k select-pane -U
-bind l select-pane -R
+The tmux config lives in `~/.config/tmux/` with modular files for options,
+keybindings, and themes. Key settings for this workflow:
 
-# Quick pane splitting
-bind | split-window -h -c '#{pane_current_path}'
-bind - split-window -v -c '#{pane_current_path}'
-
-# Resize panes easily
-bind -r H resize-pane -L 5
-bind -r J resize-pane -D 5
-bind -r K resize-pane -U 5
-bind -r L resize-pane -R 5
-
-# Start windows and panes at 1, not 0
-set -g base-index 1
-setw -g pane-base-index 1
-
-# Enable mouse support
-set -g mouse on
-```
+- **Prefix**: `Ctrl-t` (instead of default `Ctrl-b`)
+- **Pane navigation**: `Ctrl-h/j/k/l` (vim-style, integrates with vim-tmux-navigator)
+- **Splits**: `|` for vertical, `-` for horizontal (preserves current path)
+- **Popups**: `g` for lazygit, `f` for ranger, `h` for htop
+- **Zoom**: `Ctrl-t z` to toggle full-screen on any pane
+- **Mouse**: enabled
 
 ## Development Flow
 
 ### Pane Responsibilities
-1. Neovim (Pane 0) - Primary editing
-2. Claude Code (Pane 1) - AI assistance without context switching
-3. Git/Tests (Pane 2) - Quick commands: `git st`, `rspec`, `git pf`, `lazygit`
-4. Rails Server (Pane 3) - Monitor logs with `bin/dev`
+1. **Shell (left)** - Server processes, one-off commands, anything requiring
+   direct terminal control
+2. **Claude Code (right)** - Editing, git, tests, codebase exploration, and
+   AI-assisted development
 
 ### Workflow Pattern
 ```bash
-# 1. Start in Neovim pane (0) - edit code
-# 2. Ctrl-b → to Claude pane (1) - ask for help or generate code
-# 3. Ctrl-b ↓ to Rails pane (3) - check server response
-# 4. Ctrl-b ← to Git pane (2) - run tests: bundle exec rspec, commit changes
-# 5. Ctrl-b ↑ back to Neovim - implement fixes and continue
+# 1. Claude pane (right) - ask Claude to implement, edit, or explore code
+# 2. Shell pane (left) - start bin/dev, run a migration, check logs
+# 3. Ctrl-t h/l to switch between panes
+# 4. Ctrl-t z to zoom a pane for full-screen reading
 ```
 
-## Claude Code Integration
-
-### Useful Commands
-- "Show me where X is implemented" - Get file:line references
-- "Find all places that use Y" - Search and analyze codebase
-- "Write RSpec tests for this feature" - Generate tests
-- "Following this app's patterns, implement..." - Get convention-aware code
-
-### Working with Context
-Claude remembers git state, recent edits, and preferences. Reference earlier work ("that test we just wrote") and share conventions early: commit styles, code patterns, git aliases.
+### What Claude Handles Directly
+- File editing (reads, writes, and diffs without needing a separate editor)
+- Git operations (status, commits, branches, PRs)
+- Running tests (`bundle exec rspec`, etc.)
+- Codebase search and exploration
+- Convention-aware code generation
 
 ## Git Aliases
 
@@ -162,9 +142,9 @@ git up      # pull --rebase --autostash
 ## Tips
 
 ### Session Persistence
-Sessions survive sleep/wake cycles. Detach with `Ctrl-b d` and reattach anytime.
+Sessions survive sleep/wake cycles. Detach with `Ctrl-t d` and reattach anytime.
 
 ### Pane Management
-- Use `Ctrl-b z` to zoom when reading longer Claude responses
+- Use `Ctrl-t z` to zoom when reading longer Claude responses
 - Resize panes based on current task
 - Create multiple windows for different work (feature vs debugging)

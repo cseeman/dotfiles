@@ -47,8 +47,8 @@ I'm a firm believer that your development environment should get out of your way
 
 ### 🤖 AI Integration Scripts
 - `dev-scripts/` - Where the magic happens
-  - `dev-session` - Automated tmux setup that puts Claude exactly where I need it
-  - A 4-pane layout that actually makes sense for AI-assisted development
+  - `dev-session` - Automated tmux setup that puts Claude right next to a shell
+  - A 2-pane layout: shell on the left, Claude on the right
 
 ### 🎯 Git Configuration
 - Aliases that match how my brain works
@@ -57,19 +57,18 @@ I'm a firm believer that your development environment should get out of your way
 
 ## The Tmux + AI Workflow
 
-After months of experimentation, I've landed on a 4-pane setup that actually works:
+After months of experimentation, I've simplified down to a 2-pane setup:
 
 ```
-┌──────────────┬──────────────┐
-│   Neovim    │    Claude    │
-│  (coding)   │ (questions)  │
-├──────────────┼──────────────┤
-│   Server    │   lazygit    │
-│ (Overmind)  │   (sanity)   │
-└──────────────┴──────────────┘
+┌─────────────────────────┬─────────────────────────┐
+│                         │                         │
+│   Shell                 │   Claude Code           │
+│   (commands, server)    │   (AI pair programmer)  │
+│                         │                         │
+└─────────────────────────┴─────────────────────────┘
 ```
 
-Why? Because context switching kills flow. This setup lets me code, ask questions, see logs, and manage Git without ever leaving my happy place.
+Claude Code handles file editing, git, tests, and codebase exploration directly, so dedicated panes for each are no longer needed. The shell is there for anything requiring direct terminal control -- running a server, quick one-off commands, checking logs. Claude handles the rest.
 
 ## Quick Start
 

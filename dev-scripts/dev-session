@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Universal Development Session Script
-# Creates a 2-pane tmux layout for any Rails project or worktree
+# Creates a 2-pane tmux layout: shell (left) | claude (right)
 # Usage: ./dev-session [session-name] [directory]
 
 # Configuration
