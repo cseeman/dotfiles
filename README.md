@@ -29,8 +29,9 @@ I'm a firm believer that your development environment should get out of your way
   - 🌰 **Gruvbox** - Classic warm earth tones
 
 ### 💎 Ruby/Rails Tooling
-- `.tool-versions` - asdf keeping my Ruby versions in check
+- `.tool-versions` - mise keeping my Ruby versions in check
 - Git aliases that make sense for Rails work (`git pf` is life)
+- Worktree aliases for branch-per-feature workflows (`git wclean`, `git wlist`)
 
 ### ✨ The Neovim Setup
 - `.config/nvim/init.lua` - My Lua config (finally migrated from Vimscript!)
@@ -49,6 +50,10 @@ I'm a firm believer that your development environment should get out of your way
 - `dev-scripts/` - Where the magic happens
   - `dev-session` - Automated tmux setup that puts Claude right next to a shell
   - A 2-pane layout: shell on the left, Claude on the right
+
+### 🤖 Claude Code Preferences
+- `.claude/CLAUDE.md` - Work context and communication style
+- `.claude/CLAUDE-user-preferences.md` - Code style, git workflow, PR conventions
 
 ### 🎯 Git Configuration
 - Aliases that match how my brain works
@@ -105,13 +110,13 @@ ln -sf ~/Documents/Repos/dotfiles/dev-scripts/dev-session ~/bin/dev-session
 ## The Evolution
 
 This is a living repository. As I discover new tools, refine my workflow, or finally fix that annoying thing that's been bugging me for months, these configs evolve. Recent additions include:
+- **Simplified 2-pane layout** (February 2026) - Shell + Claude replaces the old 4-pane setup
+- **mise migration** - Replaced asdf and nodenv with mise for version management
+- **Worktree aliases** - `git wclean`, `git wlist`, `git wt-status` for branch-per-feature work
+- **Claude Code preferences** - Versioned AI pair programming conventions
 - **Theme Switching System** (August 2025) - Three coordinated themes across tmux and Starship
 - **Enhanced Copy/Paste** - Fixed vim bindings that actually work with macOS
 - **Modular tmux Config** - Clean, organized, and easily maintainable
-- **Smart Git Branch Display** - No more truncated branch names (up to 35 chars!)
-- Claude integration that actually helps rather than hinders
-- Overmind setup for managing Rails processes without losing my mind
-- lazygit because sometimes GUIs are okay (don't @ me)
 
 ## Fair Warning
 
@@ -123,4 +128,4 @@ This is my personal setup, but if you spot something obviously wrong or have a c
 
 ---
 
-*Last updated: August 2025 - Now with 100% more AI and 50% less GitHub tokens in the bashrc* 😅
+*Last updated: February 2026 - Now with mise, a 2-pane AI workflow, and versioned Claude preferences* 😅
