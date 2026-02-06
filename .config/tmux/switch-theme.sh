@@ -7,27 +7,38 @@ TMUX_CONFIG_DIR="$HOME/.config/tmux"
 THEME_DIR="$TMUX_CONFIG_DIR/config"
 CURRENT_THEME_LINK="$THEME_DIR/theme.conf"
 
+# Theme registry: name|file|mode
+THEMES=(
+    "tokyo|theme-tokyo.conf|dark"
+    "catppuccin|theme-catppuccin.conf|dark"
+    "everforest|theme-everforest.conf|dark"
+    "latte|theme-catppuccin-latte.conf|light"
+    "rosepine-dawn|theme-rosepine-dawn.conf|light"
+    "original|theme-original.conf|dark"
+)
+
 # Function to get theme file
 get_theme_file() {
-    case "$1" in
-        tokyo) echo "theme-tokyo.conf" ;;
-        catppuccin) echo "theme-catppuccin.conf" ;;
-        latte) echo "theme-catppuccin-latte.conf" ;;
-        original) echo "theme-original.conf" ;;
-        *) echo "" ;;
-    esac
+    for entry in "${THEMES[@]}"; do
+        IFS='|' read -r name file mode <<< "$entry"
+        if [[ "$name" == "$1" ]]; then
+            echo "$file"
+            return
+        fi
+    done
+    echo ""
 }
 
 # Function to list available themes
 list_themes() {
     echo "Available themes:"
-    for name in tokyo catppuccin latte original; do
-        theme_file=$(get_theme_file "$name")
-        if [[ -f "$THEME_DIR/$theme_file" ]]; then
-            if [[ "$CURRENT_THEME_LINK" -ef "$THEME_DIR/$theme_file" ]]; then
-                echo "  * $name (current)"
+    for entry in "${THEMES[@]}"; do
+        IFS='|' read -r name file mode <<< "$entry"
+        if [[ -f "$THEME_DIR/$file" ]]; then
+            if [[ "$CURRENT_THEME_LINK" -ef "$THEME_DIR/$file" ]]; then
+                echo "  * $name ($mode) (current)"
             else
-                echo "    $name"
+                echo "    $name ($mode)"
             fi
         fi
     done
