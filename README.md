@@ -57,12 +57,9 @@ Claude handles editing, git, tests, and codebase exploration directly. The shell
 ## Quick Start
 
 ```bash
-# Full setup
 git clone <your-repo-url> ~/Documents/Repos/dotfiles
-./install-themes.sh
-exec $SHELL
 
-# Or symlink what you want
+# Symlink what you want
 ln -sf ~/Documents/Repos/dotfiles/.config/tmux ~/.config/tmux
 ln -sf ~/Documents/Repos/dotfiles/.config/nvim ~/.config/nvim
 ln -sf ~/Documents/Repos/dotfiles/.config/starship.toml ~/.config/starship.toml
