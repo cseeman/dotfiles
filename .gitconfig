@@ -1,4 +1,4 @@
-# ~/.gitconfig 
+# ~/.gitconfig
 [user]
 	name = Christine Seeman
 	mail = christine.seeman@sofwarellc.com
@@ -14,7 +14,7 @@
   b      = branch
   prb    = pull --rebase
   pf     = push --force-with-lease
-  pfu    = push --force-with-lease -u origin HEAD    
+  pfu    = push --force-with-lease -u origin HEAD
   fo     = fetch origin
   ff     = merge --ff-only
   noff   = merge --no-ff
@@ -26,7 +26,6 @@
   lll    = log -p
   oops   = reset --hard HEAD~1
   up     = pull --rebase --autostash
-  recent = branch --sort=-committerdate --format=\"%(committerdate:relative)%09%(refname:short)\"
   remotes = remote -v
   rhh = reset --hard HEAD
   rh = reset --hard
@@ -34,12 +33,37 @@
   unstash = stash pop
   fixup = commit --fixup
   wup = log --pretty=format:'%h %cn %cr %s' --graph --since=10.weeks
-  recent = branch --sort=-committerdate --format="%(committerdate:relative)%09%(refname:short)"
   #Typical Spelling snafu
   checkou = checkout
   statsh = stash
   cop = add -N .; git diff --name-only | xargs rubocop
 	conflicts = diff --name-only --diff-filter=U
+	wt-status = !pwd && git branch --show-current && git status --short
+  wlist = !git worktree list --porcelain | grep -A 2 "$(pwd)"
+  wclean = "!f() { \
+    if [ -z \"$1\" ]; then \
+      echo \"Usage: git wclean <worktree-name-or-path>\"; \
+      echo \"Example: git wclean my-feature-branch\"; \
+      echo \"Example: git wclean /path/to/worktree\"; \
+      return 1; \
+    fi; \
+    echo \"Removing worktree: $1\"; \
+    git worktree remove --force \"$1\" && \
+    if git show-ref --verify --quiet refs/heads/\"$(basename \"$1\")\"; then \
+      echo \"Deleting local branch: $(basename \"$1\")\"; \
+      git branch -d \"$(basename \"$1\")\"; \
+    fi; \
+    echo \"Pruning stale worktree references\"; \
+    git worktree prune; \
+    echo \"Worktree cleanup complete!\"; \
+  }; f"
+  ps = push origin HEAD
+	recent-pager = branch --sort=-committerdate --format=\"%(committerdate:relative)%09%(refname:short)\" | less -FX
+	recents = \\!/Users/christine/bin/git-recent-smart
+	recent5 = \\!/Users/christine/bin/git-recent5
+	recent10 = \\!/Users/christine/bin/git-recent10
+	recent = for-each-ref --sort=-committerdate --format=\"%(committerdate:relative)%09%(refname:short)\" --count=10 refs/heads/
+	reword = commit --amend --only
 [column]
         ui = auto
 [commit]
@@ -62,4 +86,3 @@
 	defaultBranch = main
 [pull]
 	rebase = true
-
