@@ -26,7 +26,21 @@ alias dev="/Users/christine/Documents/Repos/dev-scripts/dev-session"
 #[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
 eval "$(starship init bash)"
 
-#shell completions for asdf
-. <(asdf completion bash)
+# asdf completions (disabled - using mise instead)
+# . <(asdf completion bash)
+
+# mise completions
+eval "$(mise completion bash)"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+# Clear screen aliases
+alias cls='clear && tmux clear-history 2>/dev/null || clear'
+alias cl='clear'
+
+# Function for complete clear
+clearall() {
+    clear
+    if [ -n "$TMUX" ]; then
+        tmux clear-history
+    fi
+}

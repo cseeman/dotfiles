@@ -14,8 +14,11 @@ export PATH="/usr/local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/bin:/bin:/
 # Add Homebrew paths
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 
-# Add ASDF for version management
-export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+# ASDF (disabled - using mise instead)
+# export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+
+# mise-en-place for version management (replaces asdf + nodenv)
+eval "$(mise activate bash)"
 
 # Add local bin directory (this was your issue - needs to be expanded)
 export PATH="$HOME/.local/bin:$PATH"
@@ -27,9 +30,9 @@ export PATH="$HOME/rubyonmac:$PATH"
 # Development Tools
 # =============================================================================
 
-# Node.js version management with nodenv
-eval "$(nodenv init -)"
-nodenv global 20.18.1
+# nodenv (disabled - using mise instead)
+# eval "$(nodenv init -)"
+# nodenv global 20.18.1
 
 # =============================================================================
 # Git Configuration
