@@ -14,6 +14,7 @@ THEMES=(
     "everforest|theme-everforest.conf|dark"
     "latte|theme-catppuccin-latte.conf|light"
     "rosepine-dawn|theme-rosepine-dawn.conf|light"
+    "gruvbox-light|theme-gruvbox-light.conf|light"
     "original|theme-original.conf|dark"
 )
 

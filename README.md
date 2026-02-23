@@ -16,7 +16,7 @@ Primarily for me (hi future Christine!), but if you're a Ruby dev who lives in t
 - Gruvbox theme, Rails plugins, FZF integration
 
 ### Tmux
-- `.config/tmux/` - Modular config with five themes and a switcher
+- `.config/tmux/` - Modular config with six themes and a switcher
 - Vim-style copy/paste that actually works with macOS
 - Pane borders with status indicators
 
@@ -28,6 +28,7 @@ Primarily for me (hi future Christine!), but if you're a Ruby dev who lives in t
 | `everforest` | dark | Nature-inspired, best readability for diffs |
 | `latte` | light | Catppuccin light variant |
 | `rosepine-dawn` | light | Warm cream, high contrast for reading AI output |
+| `gruvbox-light` | light | Warm neutral, highest contrast for terminal tools |
 
 Symlink the tmux config directory to use the switcher:
 ```bash
@@ -64,6 +65,7 @@ ln -sf ~/Documents/Repos/dotfiles/.config/tmux ~/.config/tmux
 ln -sf ~/Documents/Repos/dotfiles/.config/nvim ~/.config/nvim
 ln -sf ~/Documents/Repos/dotfiles/.config/starship.toml ~/.config/starship.toml
 ln -sf ~/Documents/Repos/dotfiles/.gitconfig ~/.gitconfig
+ln -sf ~/Documents/Repos/dotfiles/.config/glow/glow.yml ~/Library/Preferences/glow/glow.yml
 ln -sf ~/Documents/Repos/dotfiles/dev-scripts/dev-session ~/bin/dev-session
 ```
 
