@@ -20,8 +20,8 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 # mise-en-place for version management (replaces asdf + nodenv)
 eval "$(mise activate bash)"
 
-# Add local bin directory (this was your issue - needs to be expanded)
-export PATH="$HOME/.local/bin:$PATH"
+# Personal scripts (dev-session, git-recent-*) and pipx-style installs
+export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 
 # Add custom Ruby on Mac directory
 export PATH="$HOME/rubyonmac:$PATH"
