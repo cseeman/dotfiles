@@ -86,6 +86,8 @@
 	autocorrect = prompt
 [init]
 	defaultBranch = main
+[merge]
+	conflictStyle = zdiff3
 [pull]
 	rebase = true
 [push]
