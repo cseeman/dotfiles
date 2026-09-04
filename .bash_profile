@@ -5,8 +5,6 @@
 [[ -n ${_DOTFILES_PROFILE_LOADED:-} ]] && return
 _DOTFILES_PROFILE_LOADED=1
 
-export BASH_SILENCE_DEPRECATION_WARNING=1
-
 # Reset rather than prepend, so nested login shells (tmux) do not pile up duplicates.
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export PATH="$HOME/rubyonmac:$HOME/bin:$HOME/.local/bin:$PATH"
