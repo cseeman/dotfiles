@@ -7,8 +7,8 @@ Primarily for me (hi future Christine!), but if you're a Ruby dev who lives in t
 ## What's Inside
 
 ### Shell & Terminal
-- `.bashrc` & `.bash_profile` - Bash with mise for version management
-- `.zshrc` - Minimal zsh config for when I reach for it
+- `.bash_profile` & `.bashrc` - Homebrew bash 5 with mise for version management
+- `.zprofile` & `.zshrc` - Minimal zsh, kept in step with bash for when I reach for it
 - **Starship prompt** with a palette generated for every tmux theme
 
 ### Neovim
@@ -48,6 +48,7 @@ background to match. Details in `.config/tmux/THEMES.md`.
 
 ### Git
 - `.gitconfig` - Aliases (`git pf`, `git can`, `git up`), worktree helpers (`git wclean`, `git wlist`), GPG signing
+- Stacked-branch defaults: `rebase.updateRefs`, `autoSquash`, `autoStash`, `rerere`, `push.autoSetupRemote`
 
 ## The Layout
 
@@ -68,7 +69,8 @@ Claude handles editing, git, tests, and codebase exploration directly. The shell
 git clone <your-repo-url> ~/Documents/Repos/dotfiles
 cd ~/Documents/Repos/dotfiles
 ./install.sh --dry-run   # see what would change
-./install.sh             # symlink configs, brew bundle, tmux + nvim plugins
+./install.sh             # symlink configs, brew bundle, tmux + nvim plugins,
+                         # default theme and font
 ```
 
 Anything the installer replaces is moved to `~/.dotfiles-backup/<timestamp>/`.
@@ -80,4 +82,4 @@ server, and starts Neovim headless. Run it before committing.
 
 ---
 
-Opinionated and personal. Your mileage may vary. If you spot something wrong, let me know -- Rails devs gotta stick together.
+Opinionated and personal. Your mileage may vary. If you spot something wrong, let me know, Rails devs gotta stick together.
