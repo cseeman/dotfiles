@@ -19,7 +19,7 @@
   ff     = merge --ff-only
   noff   = merge --no-ff
   nocom  = merge --no-commit
-  rip    = rebase --interactive --preserve-merges
+  rip    = rebase --interactive --rebase-merges
   l      = log --graph --oneline
   lb     = log --graph --oneline --branches
   ll     = log --stat
@@ -36,7 +36,7 @@
   #Typical Spelling snafu
   checkou = checkout
   statsh = stash
-  cop = add -N .; git diff --name-only | xargs rubocop
+  cop = !git add -N . && git diff --name-only | xargs rubocop
 	conflicts = diff --name-only --diff-filter=U
 	wt-status = !pwd && git branch --show-current && git status --short
   wlist = !git worktree list --porcelain | grep -A 2 "$(pwd)"
@@ -59,9 +59,9 @@
   }; f"
   ps = push origin HEAD
 	recent-pager = branch --sort=-committerdate --format=\"%(committerdate:relative)%09%(refname:short)\" | less -FX
-	recents = \\!/Users/christine/bin/git-recent-smart
-	recent5 = \\!/Users/christine/bin/git-recent5
-	recent10 = \\!/Users/christine/bin/git-recent10
+	recents = !/Users/christine/bin/git-recent-smart
+	recent5 = !/Users/christine/bin/git-recent5
+	recent10 = !/Users/christine/bin/git-recent10
 	recent = for-each-ref --sort=-committerdate --format=\"%(committerdate:relative)%09%(refname:short)\" --count=10 refs/heads/
 	reword = commit --amend --only
 [column]
