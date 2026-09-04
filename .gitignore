@@ -19,3 +19,7 @@
 old_*
 # Active theme pointer, set by switch-theme.sh
 .config/tmux/config/theme.conf
+
+# tmux plugins are installed by tpm; resurrect holds saved sessions
+.config/tmux/plugins/
+.config/tmux/resurrect/
