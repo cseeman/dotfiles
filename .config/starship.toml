@@ -10,18 +10,13 @@ $directory\
 $git_branch\
 $git_status\
 [](fg:color_git bg:color_lang)\
-$c\
-$rust\
-$golang\
+$ruby\
 $nodejs\
-$php\
-$java\
-$kotlin\
-$haskell\
 $python\
 [](fg:color_lang bg:color_ui1)\
 $docker_context\
-$conda\
+$jobs\
+$cmd_duration\
 [](fg:color_ui1 bg:color_ui2)\
 $time\
 [ ](fg:color_ui2)\
@@ -84,42 +79,12 @@ format = '[[ $symbol $branch ](fg:color_text bg:color_git)]($style)'
 style = "bg:color_git"
 format = '[[($all_status$ahead_behind )](fg:color_text bg:color_git)]($style)'
 
+[ruby]
+symbol = ""
+style = "bg:color_lang"
+format = '[[ $symbol( $version) ](fg:color_text bg:color_lang)]($style)'
+
 [nodejs]
-symbol = ""
-style = "bg:color_lang"
-format = '[[ $symbol( $version) ](fg:color_text bg:color_lang)]($style)'
-
-[c]
-symbol = " "
-style = "bg:color_lang"
-format = '[[ $symbol( $version) ](fg:color_text bg:color_lang)]($style)'
-
-[rust]
-symbol = ""
-style = "bg:color_lang"
-format = '[[ $symbol( $version) ](fg:color_text bg:color_lang)]($style)'
-
-[golang]
-symbol = ""
-style = "bg:color_lang"
-format = '[[ $symbol( $version) ](fg:color_text bg:color_lang)]($style)'
-
-[php]
-symbol = ""
-style = "bg:color_lang"
-format = '[[ $symbol( $version) ](fg:color_text bg:color_lang)]($style)'
-
-[java]
-symbol = ""
-style = "bg:color_lang"
-format = '[[ $symbol( $version) ](fg:color_text bg:color_lang)]($style)'
-
-[kotlin]
-symbol = ""
-style = "bg:color_lang"
-format = '[[ $symbol( $version) ](fg:color_text bg:color_lang)]($style)'
-
-[haskell]
 symbol = ""
 style = "bg:color_lang"
 format = '[[ $symbol( $version) ](fg:color_text bg:color_lang)]($style)'
@@ -134,9 +99,15 @@ symbol = ""
 style = "bg:color_ui1"
 format = '[[ $symbol( $context) ](fg:color_text_end bg:color_ui1)]($style)'
 
-[conda]
+[jobs]
+symbol = ""
 style = "bg:color_ui1"
-format = '[[ $symbol( $environment) ](fg:color_text_end bg:color_ui1)]($style)'
+format = '[[ $symbol $number ](fg:color_text_end bg:color_ui1)]($style)'
+
+[cmd_duration]
+min_time = 2000
+style = "bg:color_ui1"
+format = '[[  $duration ](fg:color_text_end bg:color_ui1)]($style)'
 
 [time]
 disabled = false
