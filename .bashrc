@@ -18,7 +18,7 @@ export BASH_CONF="bashrc"
 #source ~/.git-completion.bash
 
 alias vim="nvim"
-alias dev="/Users/christine/Documents/Repos/dev-scripts/dev-session"
+alias dev="dev-session"
 #alias l='exa'
 #alias ls='exa -a'
 
