@@ -2,18 +2,20 @@
 # bin/gen-starship-palettes.sh, so tmux theme names and Starship palette
 # names cannot drift apart.
 #
-# Format: name|tmux-theme-file|mode|description
+# Format: name|tmux-theme-file|mode|description|alacritty-theme
+# The last column names a file in ~/.config/alacritty/themes/themes/ and may be
+# empty, in which case switch-theme.sh uses the default for the mode.
 # Lines starting with # and blank lines are ignored.
 
-tokyo|theme-tokyo.conf|dark|Tokyo Night, blue and purple
-catppuccin|theme-catppuccin.conf|dark|Catppuccin Mocha, soft pastels
-everforest|theme-everforest.conf|dark|Everforest, muted forest greens
-solstice|theme-solstice.conf|dark|Solstice, tropical ocean at dusk
-equinox|theme-equinox.conf|dark|Equinox, woodsmoke and late harvest
-original|theme-original.conf|dark|Original saved theme (Catppuccin variant)
+tokyo|theme-tokyo.conf|dark|Tokyo Night, blue and purple|tokyo_night
+catppuccin|theme-catppuccin.conf|dark|Catppuccin Mocha, soft pastels|catppuccin_mocha
+everforest|theme-everforest.conf|dark|Everforest, muted forest greens|everforest_dark
+solstice|theme-solstice.conf|dark|Solstice, tropical ocean at dusk|
+equinox|theme-equinox.conf|dark|Equinox, woodsmoke and late harvest|
+original|theme-original.conf|dark|Original saved theme (Catppuccin variant)|catppuccin_mocha
 
-latte|theme-catppuccin-latte.conf|light|Catppuccin Latte, soft pastels
-rosepine-dawn|theme-rosepine-dawn.conf|light|Rose Pine Dawn, warm muted rose
-gruvbox-light|theme-gruvbox-light.conf|light|Gruvbox Light, retro earth tones
-solstice-dawn|theme-solstice-dawn.conf|light|Solstice Dawn, sunrise on the beach
-equinox-dawn|theme-equinox-dawn.conf|light|Equinox Dawn, light through turning leaves
+latte|theme-catppuccin-latte.conf|light|Catppuccin Latte, soft pastels|catppuccin_latte
+rosepine-dawn|theme-rosepine-dawn.conf|light|Rose Pine Dawn, warm muted rose|rose_pine_dawn
+gruvbox-light|theme-gruvbox-light.conf|light|Gruvbox Light, retro earth tones|gruvbox_light
+solstice-dawn|theme-solstice-dawn.conf|light|Solstice Dawn, sunrise on the beach|dayfox
+equinox-dawn|theme-equinox-dawn.conf|light|Equinox Dawn, light through turning leaves|dawnfox

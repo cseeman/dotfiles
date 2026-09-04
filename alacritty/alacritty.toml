@@ -1,7 +1,9 @@
 [general]
+# Both imports are pointer files: theme.toml is set by tmux/switch-theme.sh,
+# font.toml by switch-font.sh.
 import = [
-    "~/.config/alacritty/themes/themes/carbonfox.toml",
-    "~/.config/alacritty/font.toml",   # pointer set by switch-font.sh
+    "~/.config/alacritty/theme.toml",
+    "~/.config/alacritty/font.toml",
 ]
 
 [env]

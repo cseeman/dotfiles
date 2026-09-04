@@ -13,7 +13,8 @@
 #
 # The theme's mode (light or dark) is also written to ~/.config/theme-mode for
 # tools that only need to know that much: Neovim reads it for 'background', and
-# glow's style line is rewritten here directly.
+# glow's style line is rewritten here directly. Alacritty follows through a
+# pointer file that imports one of the alacritty-theme files.
 
 set -euo pipefail
 
@@ -28,6 +29,10 @@ readonly ACTIVE_LINK="$THEME_DIR/theme.conf"
 readonly STARSHIP_TOML="${STARSHIP_TOML:-$HOME/.config/starship.toml}"
 readonly MODE_FILE="${THEME_MODE_FILE:-$HOME/.config/theme-mode}"
 readonly GLOW_YML="${GLOW_YML:-$HOME/Library/Preferences/glow/glow.yml}"
+readonly ALACRITTY_THEMES="${ALACRITTY_THEMES:-$HOME/.config/alacritty/themes/themes}"
+readonly ALACRITTY_POINTER="${ALACRITTY_POINTER:-$HOME/.config/alacritty/theme.toml}"
+readonly ALACRITTY_DARK_DEFAULT="carbonfox"
+readonly ALACRITTY_LIGHT_DEFAULT="dayfox"
 
 # Muted greys for ANSI 7 and 8. Tools such as Claude Code use these for status
 # text; the terminal defaults are tuned for dark backgrounds and drop to ~2.3:1
@@ -41,19 +46,21 @@ THEME_NAMES=()
 THEME_FILES=()
 THEME_MODES=()
 THEME_DESCS=()
+THEME_ALACRITTY=()
 
 die() { printf '%s: %s\n' "$PROGRAM" "$*" >&2; exit 1; }
 warn() { printf '%s: %s\n' "$PROGRAM" "$*" >&2; }
 
 load_registry() {
     [[ -f $REGISTRY ]] || die "registry not found: $REGISTRY"
-    local name file mode desc
-    while IFS='|' read -r name file mode desc; do
+    local name file mode desc alacritty
+    while IFS='|' read -r name file mode desc alacritty; do
         [[ -z $name || $name == \#* ]] && continue
         THEME_NAMES+=("$name")
         THEME_FILES+=("$file")
         THEME_MODES+=("$mode")
         THEME_DESCS+=("$desc")
+        THEME_ALACRITTY+=("$alacritty")
     done < "$REGISTRY"
     [[ ${#THEME_NAMES[@]} -gt 0 ]] || die "registry is empty: $REGISTRY"
 }
@@ -141,6 +148,17 @@ apply_glow() {
     rm -f "$tmp"
 }
 
+apply_alacritty() {
+    local idx=$1 mode=$2 name=${THEME_ALACRITTY[$1]}
+    [[ -d $ALACRITTY_THEMES ]] || return 0
+    if [[ -z $name ]]; then
+        [[ $mode == light ]] && name=$ALACRITTY_LIGHT_DEFAULT || name=$ALACRITTY_DARK_DEFAULT
+    fi
+    local file="$ALACRITTY_THEMES/$name.toml"
+    [[ -f $file ]] || { warn "no alacritty theme '$name' in $ALACRITTY_THEMES; skipping"; return 0; }
+    ln -sfn "$file" "$ALACRITTY_POINTER"
+}
+
 # shellcheck disable=SC1003  # the \\ is the OSC string terminator, not a quote
 apply_ansi() {
     # Only meaningful when stdout is a terminal; from tmux run-shell these
@@ -217,6 +235,7 @@ cmd_switch() {
     [[ $SKIP_STARSHIP == 1 ]] || apply_starship "$name"
     apply_mode "${THEME_MODES[$idx]}"
     apply_glow "${THEME_MODES[$idx]}"
+    apply_alacritty "$idx" "${THEME_MODES[$idx]}"
     apply_ansi "${THEME_MODES[$idx]}"
 
     printf 'Switched to %s (%s)\n' "$name" "${THEME_MODES[$idx]}"
@@ -226,7 +245,7 @@ cmd_switch() {
 
 usage() {
     cat <<USAGE
-$PROGRAM - switch the tmux theme, Starship palette, and light/dark mode together
+$PROGRAM - switch the tmux theme, Starship palette, Alacritty theme, and light/dark mode together
 
 Usage:
   $PROGRAM <theme>        switch to a theme

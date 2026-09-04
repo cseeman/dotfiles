@@ -1,7 +1,7 @@
 # Theming
 
-One switcher changes the tmux theme, the Starship prompt palette, and the
-light/dark mode that glow and Neovim follow.
+One switcher changes the tmux theme, the Starship prompt palette, the Alacritty
+theme, and the light/dark mode that glow and Neovim follow.
 
 ```
 ~/.config/tmux/switch-theme.sh equinox      # switch both
@@ -22,6 +22,7 @@ light/dark mode that glow and Neovim follow.
 | `../starship.toml` | Prompt config; holds every palette, one `palette =` line selects. |
 | `~/.config/theme-mode` | `light` or `dark`. Written on every switch, read by Neovim at startup. |
 | `../glow/glow.yml` | Its `style:` line is rewritten to the mode on every switch. |
+| `~/.config/alacritty/theme.toml` | Symlink into the alacritty-theme checkout, repointed on every switch. |
 
 tmux switches by repointing `config/theme.conf` and sourcing the config.
 Starship switches by rewriting its `palette =` line, which every shell picks up
@@ -35,7 +36,9 @@ background until restarted. glow picks the new style up on its next run.
 1. Write `config/theme-<name>.conf`. Colors only: no `default-terminal`, no
    `command-alias`, no other global settings. Those live in `config/options.conf`
    so a theme switch cannot quietly change unrelated behavior.
-2. Add a line to `themes.registry`: `name|file|mode|description`.
+2. Add a line to `themes.registry`: `name|file|mode|description|alacritty-theme`.
+   The last column is a file name from `~/.config/alacritty/themes/themes/`;
+   leave it empty to get carbonfox (dark) or dayfox (light).
 3. Run `bin/gen-starship-palettes.sh` to generate the matching prompt palette.
 
 The generator sources each theme into a throwaway tmux server and reads the

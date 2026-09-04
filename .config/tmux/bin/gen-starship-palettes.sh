@@ -123,8 +123,8 @@ main() {
     {
         printf '%s\n' "$BEGIN_MARK"
         printf '# Derived from the tmux themes. Run bin/gen-starship-palettes.sh to refresh.\n\n'
-        local name file _mode _desc count=0
-        while IFS='|' read -r name file _mode _desc; do
+        local name file _mode _desc _alacritty count=0
+        while IFS='|' read -r name file _mode _desc _alacritty; do
             [[ -z "$name" || "$name" == \#* ]] && continue
             [[ -f "$THEME_DIR/$file" ]] || { printf 'skip %s: missing %s\n' "$name" "$file" >&2; continue; }
             emit_palette "$name" "$THEME_DIR/$file"

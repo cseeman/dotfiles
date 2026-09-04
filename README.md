@@ -35,11 +35,11 @@ Primarily for me (hi future Christine!), but if you're a Ruby dev who lives in t
 | `solstice-dawn` | light | Sunrise on the beach |
 | `equinox-dawn` | light | Light through turning leaves |
 
-Switching a theme also sets the Starship palette, glow's style, and Neovim's
-background to match. Details in `.config/tmux/THEMES.md`.
+Switching a theme also sets the Starship palette, the Alacritty theme, glow's
+style, and Neovim's background to match. Details in `.config/tmux/THEMES.md`.
 
 ### Alacritty
-- `alacritty/alacritty.toml` - Window, shell, and theme import
+- `alacritty/alacritty.toml` - Window, shell, and two pointer imports: theme and font
 - `alacritty/fonts/` - One file per font; `switch-font.sh <name>` picks one
 
 ### AI Workflow

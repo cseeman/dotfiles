@@ -15,6 +15,7 @@ readonly PLUG_VIM="$HOME/.local/share/nvim/site/autoload/plug.vim"
 readonly DEFAULT_THEME="equinox-dawn"
 readonly DEFAULT_FONT="maple"
 readonly FONT_POINTER="$HOME/.config/alacritty/font.toml"
+readonly ALACRITTY_THEMES="$HOME/.config/alacritty/themes"
 
 DRY_RUN=0
 WITH_BREW=1
@@ -112,6 +113,16 @@ select_theme() {
     run "$DOTFILES/.config/tmux/switch-theme.sh" "$DEFAULT_THEME"
 }
 
+install_alacritty_themes() {
+    printf '\nAlacritty themes\n'
+    if [[ -d $ALACRITTY_THEMES ]]; then
+        log "ok" "$ALACRITTY_THEMES"
+        return 0
+    fi
+    run git clone --quiet https://github.com/alacritty/alacritty-theme "$ALACRITTY_THEMES"
+    log "clone" "$ALACRITTY_THEMES"
+}
+
 select_font() {
     printf '\nAlacritty font\n'
     if [[ -L $FONT_POINTER ]]; then
@@ -151,6 +162,7 @@ main() {
     link_all
     [[ $WITH_BREW == 1 ]] && install_brew
     install_tmux_plugins
+    install_alacritty_themes
     select_theme
     select_font
     install_vim_plug
