@@ -1,109 +1,42 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Two-pane tmux session: shell on the left, Claude Code on the right.
+# Usage: dev-session [session-name] [directory]
 
-# Universal Development Session Script
-# Creates a 2-pane tmux layout: shell (left) | claude (right)
-# Usage: ./dev-session [session-name] [directory]
+set -euo pipefail
 
-# Configuration
-DEFAULT_EDITOR="nvim"
-DEFAULT_PORT="3000"
-
-# Helper functions
-get_current_dir() {
-    pwd
+session_name() {
+    local project branch
+    project=$(basename "$PWD")
+    branch=$(git branch --show-current 2>/dev/null || true)
+    case $branch in
+        ""|main|master|develop) printf '%s' "$project" ;;
+        *)                      printf '%s-%s' "$project" "$branch" ;;
+    esac
 }
 
-get_project_name() {
-    basename "$(get_current_dir)"
-}
+# tmux rejects '.' and ':' in session names; '/' is flattened for readability.
+sanitize() { printf '%s' "$1" | tr '/:.' '---'; }
 
-get_branch_name() {
-    if git rev-parse --git-dir > /dev/null 2>&1; then
-        git branch --show-current 2>/dev/null || echo "main"
+work_dir=${2:-$PWD}
+[[ -d $work_dir ]] || { printf 'dev-session: no such directory: %s\n' "$work_dir" >&2; exit 1; }
+cd "$work_dir"
+session=$(sanitize "${1:-$(session_name)}")
+
+attach() {
+    if [[ -n ${TMUX:-} ]]; then
+        exec tmux switch-client -t "=$session"
     else
-        echo "no-git"
+        exec tmux attach-session -t "=$session"
     fi
 }
 
-generate_session_name() {
-    local project_name=$(get_project_name)
-    local branch_name=$(get_branch_name)
-    
-    # Create meaningful session name (replace slashes to avoid tmux parsing issues)
-    if [[ "$branch_name" != "main" && "$branch_name" != "develop" && "$branch_name" != "no-git" ]]; then
-        # Replace problematic characters for tmux session names
-        safe_branch=$(echo "$branch_name" | sed 's/[\/:]/-/g')
-        echo "${project_name}-${safe_branch}"
-    else
-        echo "$project_name"
-    fi
-}
-
-is_rails_project() {
-    [[ -f "Gemfile" && -f "config/application.rb" ]]
-}
-
-get_available_port() {
-    # Start checking from default port
-    local port=$DEFAULT_PORT
-    while lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; do
-        ((port++))
-    done
-    echo $port
-}
-
-# Parse arguments
-SESSION_NAME="${1:-$(generate_session_name)}"
-WORK_DIR="${2:-$(get_current_dir)}"
-
-# Validate directory exists
-if [[ ! -d "$WORK_DIR" ]]; then
-    echo "Error: Directory $WORK_DIR does not exist"
-    exit 1
+if tmux has-session -t "=$session" 2>/dev/null; then
+    attach
 fi
 
-echo "Setting up development session: $SESSION_NAME"
-echo "Working directory: $WORK_DIR"
-
-# Check if session already exists
-if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
-    echo "Session '$SESSION_NAME' already exists. Attaching..."
-    tmux attach-session -t "$SESSION_NAME"
-    exit 0
-fi
-
-# Create new session
-echo "Creating new tmux session..."
-tmux new-session -d -s "$SESSION_NAME" -c "$WORK_DIR"
-
-# Create 2-pane layout: split horizontal
-echo "Setting up 2-pane layout..."
-tmux split-window -h -c "$WORK_DIR"           # Now: 1|2
-
-# Set up each pane
-echo "Configuring panes..."
-
-# Pane 1 (left): Basic shell
-tmux send-keys -t 1 "# Ready for commands (server, etc.)" C-m
-
-# Pane 2 (right): Claude Code
-echo "Starting Claude Code..."
-tmux send-keys -t 2 "claude" C-m
-
-# Select the shell pane to start
-tmux select-pane -t 1
-
-# Set up window name
-tmux rename-window "dev"
-
-echo "✓ Development session ready!"
-echo "Session: $SESSION_NAME"
-
-echo ""
-echo "Layout:"
-echo "┌─────────────────┬─────────────────┐"
-echo "│ shell           │ claude          │"
-echo "└─────────────────┴─────────────────┘"
-
-# Attach to the session
-tmux attach-session -t "$SESSION_NAME"
+tmux new-session -d -s "$session" -n dev -c "$work_dir"
+tmux split-window -h -t "=$session:dev" -c "$work_dir"
+tmux send-keys -t "=$session:dev.{right}" claude C-m
+tmux select-pane -t "=$session:dev.{left}"
+attach
