@@ -1,6 +1,10 @@
 local vim = vim
 local Plug = vim.fn['plug#']
 
+-- Leader must be set before any mapping that references it.
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+
 -- Essential Neovim settings
 vim.opt.mouse = 'a'                    -- Enable mouse
 vim.opt.clipboard = 'unnamedplus'      -- Use system clipboard
@@ -124,7 +128,3 @@ vim.keymap.set('n', '<C-l>', '<C-w>l', { noremap = true })
 
 -- Clear search highlighting
 vim.keymap.set('n', '<leader><CR>', ':nohlsearch<CR>', { noremap = true, silent = true })
-
--- Set leader key to space
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
