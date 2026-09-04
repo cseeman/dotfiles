@@ -1,6 +1,7 @@
 [general]
 import = [
-    "~/.config/alacritty/themes/themes/carbonfox.toml"
+    "~/.config/alacritty/themes/themes/carbonfox.toml",
+    "~/.config/alacritty/font.toml",   # pointer set by switch-font.sh
 ]
 
 [env]
@@ -11,20 +12,6 @@ startup_mode = "Fullscreen"
 decorations = "None"
 opacity = 0.7
 padding = { x = 16 , y = 16 }
-
-[font]
-# Maple Mono NF has genuine cursive italics built in --
-# no family-mixing needed, unlike the Monaspace setup.
-normal = { family = "Maple Mono NF", style = "Regular" }
-bold = { family = "Maple Mono NF", style = "Bold" }
-italic = { family = "Maple Mono NF", style = "Italic" }
-bold_italic = { family = "Maple Mono NF", style = "Bold Italic" }
-
-size = 14
-
-[font.offset]
-x = 0
-y = 1
 
 [terminal.shell]
 program = "/opt/homebrew/bin/bash"

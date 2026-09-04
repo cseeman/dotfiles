@@ -1,0 +1,12 @@
+# Radon supplies the italics: Monaspace variants share metrics, so mixing is safe.
+[font]
+normal = { family = "MonaspaceNeon NFM", style = "Regular" }
+bold = { family = "MonaspaceNeon NFM", style = "Bold" }
+italic = { family = "MonaspaceRadon NFM", style = "Italic" }
+bold_italic = { family = "MonaspaceNeon NFM", style = "Bold Italic" }
+
+size = 14
+
+[font.offset]
+x = 0
+y = 0

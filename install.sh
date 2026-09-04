@@ -12,6 +12,8 @@ readonly BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
 readonly TPM_DIR="$DOTFILES/.config/tmux/plugins/tpm"
 readonly PLUG_VIM="$HOME/.local/share/nvim/site/autoload/plug.vim"
 readonly DEFAULT_THEME="equinox-dawn"
+readonly DEFAULT_FONT="maple"
+readonly FONT_POINTER="$HOME/.config/alacritty/font.toml"
 
 DRY_RUN=0
 WITH_BREW=1
@@ -21,6 +23,7 @@ LINKS="
 .bashrc|$HOME/.bashrc
 .bash_profile|$HOME/.bash_profile
 .zshrc|$HOME/.zshrc
+.zprofile|$HOME/.zprofile
 .gitconfig|$HOME/.gitconfig
 .gitignore_global|$HOME/.gitignore_global
 .gemrc|$HOME/.gemrc
@@ -108,6 +111,15 @@ select_theme() {
     run "$DOTFILES/.config/tmux/switch-theme.sh" "$DEFAULT_THEME"
 }
 
+select_font() {
+    printf '\nAlacritty font\n'
+    if [[ -L $FONT_POINTER ]]; then
+        log "ok" "$(basename "$(readlink "$FONT_POINTER")" .toml)"
+        return 0
+    fi
+    run "$DOTFILES/alacritty/switch-font.sh" "$DEFAULT_FONT"
+}
+
 install_vim_plug() {
     printf '\nNeovim\n'
     if [[ ! -f $PLUG_VIM ]]; then
@@ -139,6 +151,7 @@ main() {
     [[ $WITH_BREW == 1 ]] && install_brew
     install_tmux_plugins
     select_theme
+    select_font
     install_vim_plug
 
     printf '\nDone. Open a new shell to pick up the changes.\n'

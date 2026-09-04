@@ -1,0 +1,11 @@
+[font]
+normal = { family = "MonaspaceArgon NFM", style = "Regular" }
+bold = { family = "MonaspaceArgon NFM", style = "Bold" }
+italic = { family = "MonaspaceArgon NFM", style = "Italic" }
+bold_italic = { family = "MonaspaceArgon NFM", style = "Bold Italic" }
+
+size = 14
+
+[font.offset]
+x = 0
+y = 0

@@ -1,177 +1,53 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# Point ~/.config/alacritty/font.toml at one of the files in fonts/.
+# alacritty.toml imports that pointer, and Alacritty reloads when it changes.
 
-# Alacritty Font Switcher
-# Usage: ./switch-font.sh [font-name]
+set -euo pipefail
 
-ALACRITTY_CONFIG="$HOME/.config/alacritty/alacritty.toml"
-BACKUP_CONFIG="$HOME/.config/alacritty/alacritty.toml.backup"
+PROGRAM=${0##*/}
+FONT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/fonts" && pwd)
+readonly PROGRAM FONT_DIR
+readonly POINTER="${ALACRITTY_FONT:-$HOME/.config/alacritty/font.toml}"
 
-# Create backup if it doesn't exist
-if [[ ! -f "$BACKUP_CONFIG" ]]; then
-    cp "$ALACRITTY_CONFIG" "$BACKUP_CONFIG"
-fi
-
-switch_font() {
-    local font_name="$1"
-    
-    case "$font_name" in
-        jetbrains)
-            cat > "$ALACRITTY_CONFIG" << 'EOF'
-[general]
-import = [
-    "~/.config/alacritty/themes/themes/carbonfox.toml"
-]
-
-[env]
-TERM = "xterm-256color"
-
-[window]
-startup_mode = "Fullscreen"
-decorations = "None"
-opacity = 0.7
-padding = { x = 16 , y = 16 }
-
-[font]
-normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
-bold = { family = "JetBrainsMono Nerd Font", style = "Bold" }
-italic = { family = "JetBrainsMono Nerd Font", style = "Italic" }
-bold_italic = { family = "JetBrainsMono Nerd Font", style = "Bold Italic" }
-
-size = 14
-
-[font.offset]
-x = 0
-y = 1
-
-[terminal.shell]
-program = "/bin/bash"
-args = ["-l"]
-EOF
-            echo "✅ Switched to JetBrains Mono (modern, with ligatures)"
-            ;;
-            
-        monaspace|neon)
-            cat > "$ALACRITTY_CONFIG" << 'EOF'
-[general]
-import = [
-    "~/.config/alacritty/themes/themes/carbonfox.toml"
-]
-
-[env]
-TERM = "xterm-256color"
-
-[window]
-startup_mode = "Fullscreen"
-decorations = "None"
-opacity = 0.7
-padding = { x = 16 , y = 16 }
-
-[font]
-normal = { family = "MonaspaceNeon NFM", style = "Regular" }
-bold = { family = "MonaspaceNeon NFM", style = "Bold" }
-italic = { family = "MonaspaceRadon NFM", style = "Italic" }
-bold_italic = { family = "MonaspaceNeon NFM", style = "Bold Italic" }
-
-size = 14
-
-[font.offset]
-x = 0
-y = 0
-
-[terminal.shell]
-program = "/bin/bash"
-args = ["-l"]
-EOF
-            echo "✅ Switched to Monaspace Neon (GitHub's new font with texture healing)"
-            ;;
-            
-        argon)
-            cat > "$ALACRITTY_CONFIG" << 'EOF'
-[general]
-import = [
-    "~/.config/alacritty/themes/themes/carbonfox.toml"
-]
-
-[env]
-TERM = "xterm-256color"
-
-[window]
-startup_mode = "Fullscreen"
-decorations = "None"
-opacity = 0.7
-padding = { x = 16 , y = 16 }
-
-[font]
-normal = { family = "MonaspaceArgon NFM", style = "Regular" }
-bold = { family = "MonaspaceArgon NFM", style = "Bold" }
-italic = { family = "MonaspaceArgon NFM", style = "Italic" }
-bold_italic = { family = "MonaspaceArgon NFM", style = "Bold Italic" }
-
-size = 14
-
-[font.offset]
-x = 0
-y = 0
-
-[terminal.shell]
-program = "/bin/bash"
-args = ["-l"]
-EOF
-            echo "✅ Switched to Monaspace Argon (clean, minimal variant)"
-            ;;
-            
-        meslo|classic)
-            cat > "$ALACRITTY_CONFIG" << 'EOF'
-[general]
-import = [
-    "~/.config/alacritty/themes/themes/carbonfox.toml"
-]
-
-[env]
-TERM = "xterm-256color"
-
-[window]
-startup_mode = "Fullscreen"
-decorations = "None"
-opacity = 0.7
-padding = { x = 16 , y = 16 }
-
-[font]
-normal.family = "MesloLGS Nerd Font Mono"
-
-size = 16
-
-[terminal.shell]
-program = "/bin/bash"
-args = ["-l"]
-EOF
-            echo "✅ Switched to MesloLGS (classic font)"
-            ;;
-            
-        *)
-            echo "Available fonts:"
-            echo "  jetbrains - JetBrains Mono (recommended, with ligatures)"
-            echo "  monaspace - Monaspace Neon (GitHub's font with texture healing)"
-            echo "  argon     - Monaspace Argon (clean minimal variant)"
-            echo "  meslo     - MesloLGS (your classic font)"
-            echo ""
-            echo "Usage: $0 <font-name>"
-            echo "Example: $0 jetbrains"
-            return 1
-            ;;
-    esac
-    
-    echo ""
-    echo "💡 Restart Alacritty to see the new font"
-    echo "💡 Test ligatures: -> => != === ++ -- >= <="
+list() {
+    local f name
+    for f in "$FONT_DIR"/*.toml; do
+        name=${f##*/}
+        printf '  %s\n' "${name%.toml}"
+    done
 }
 
-# Main
-if [[ $# -eq 0 ]]; then
-    echo "Current font configuration:"
-    grep -E "family|size" "$ALACRITTY_CONFIG" | head -5
-    echo ""
-    switch_font
-else
-    switch_font "$1"
-fi
+current() {
+    [[ -L $POINTER ]] || return 1
+    local target
+    target=$(readlink "$POINTER")
+    target=${target##*/}
+    printf '%s' "${target%.toml}"
+}
+
+usage() {
+    printf 'Usage: %s <font>\n\nFonts:\n' "$PROGRAM"
+    list
+}
+
+main() {
+    case ${1:-} in
+        "")
+            printf 'Current: %s\n\nFonts:\n' "$(current || printf 'none')"
+            list
+            ;;
+        -h|--help)
+            usage
+            ;;
+        *)
+            local file="$FONT_DIR/$1.toml"
+            [[ -f $file ]] || { printf '%s: unknown font %s\n\n' "$PROGRAM" "$1" >&2; usage >&2; exit 1; }
+            mkdir -p "$(dirname "$POINTER")"
+            ln -sfn "$file" "$POINTER"
+            printf 'Switched to %s\n' "$1"
+            ;;
+    esac
+}
+
+main "$@"

@@ -1,0 +1,12 @@
+# Maple Mono NF has genuine cursive italics built in, no family mixing needed.
+[font]
+normal = { family = "Maple Mono NF", style = "Regular" }
+bold = { family = "Maple Mono NF", style = "Bold" }
+italic = { family = "Maple Mono NF", style = "Italic" }
+bold_italic = { family = "Maple Mono NF", style = "Bold Italic" }
+
+size = 14
+
+[font.offset]
+x = 0
+y = 1
