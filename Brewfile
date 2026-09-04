@@ -14,7 +14,6 @@ brew "git"
 brew "gh"
 brew "gnupg"
 brew "pinentry-mac"
-brew "lazygit"
 
 # Terminal
 brew "tmux"

@@ -37,7 +37,6 @@ Ctrl-t |    # Split side by side
 | `Ctrl-t \|` | Split vertical |
 | `Ctrl-t -` | Split horizontal |
 | `Ctrl-t d` | Detach session |
-| `Ctrl-t g` | Lazygit popup |
 | `Ctrl-t f` | Ranger popup |
 | `Ctrl-t c` | New window |
 
