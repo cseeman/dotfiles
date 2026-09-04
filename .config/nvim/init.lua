@@ -39,12 +39,9 @@ Plug('https://tpope.io/vim/dispatch.git')
 Plug('https://github.com/tpope/vim-bundler')
 Plug('https://github.com/tpope/vim-rails')
 
--- fzf search - improved configuration
+-- fzf.vim needs the base plugin that ships with Homebrew's fzf.
+vim.opt.rtp:append('/opt/homebrew/opt/fzf')
 Plug('junegunn/fzf.vim')
-Plug('junegunn/fzf', { ['dir'] = '~/.fzf', ['do'] = './install --all' })
-
--- Use 'dir' option to install plugin in a non-default directory
--- Plug('junegunn/fzf', { ['dir'] = '~/.fzf' })
 
 -- Gruvbox Theme - making it pretty
 Plug 'ellisonleao/gruvbox.nvim'
