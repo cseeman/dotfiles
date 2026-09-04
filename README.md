@@ -9,18 +9,18 @@ Primarily for me (hi future Christine!), but if you're a Ruby dev who lives in t
 ### Shell & Terminal
 - `.bashrc` & `.bash_profile` - Bash with mise for version management
 - `.zshrc` - Minimal zsh config for when I reach for it
-- **Starship prompt** with three themes: Tokyo Night, Catppuccin Mocha, Gruvbox
+- **Starship prompt** with a palette generated for every tmux theme
 
 ### Neovim
 - `.config/nvim/init.lua` - Lua config with vim-plug (it works and I'm stubborn)
 - Gruvbox theme, Rails plugins, FZF integration
 
 ### Tmux
-- `.config/tmux/` - Modular config with six themes and a switcher
+- `.config/tmux/` - Modular config with eleven themes and a switcher (see `THEMES.md`)
 - Vim-style copy/paste that actually works with macOS
 - Pane borders with status indicators
 
-**Themes** (switch with `./switch-theme.sh <name>`):
+**Themes** (switch with `switch-theme.sh <name>` or prefix + T):
 | Name | Mode | Notes |
 |------|------|-------|
 | `tokyo` | dark | Blue/purple, the original |
@@ -30,10 +30,6 @@ Primarily for me (hi future Christine!), but if you're a Ruby dev who lives in t
 | `rosepine-dawn` | light | Warm cream, high contrast for reading AI output |
 | `gruvbox-light` | light | Warm neutral, highest contrast for terminal tools |
 
-Symlink the tmux config directory to use the switcher:
-```bash
-ln -sf ~/Documents/Repos/dotfiles/.config/tmux ~/.config/tmux
-```
 
 ### AI Workflow
 - `dev-scripts/dev-session` - Sets up a 2-pane tmux layout: shell + Claude
@@ -59,15 +55,14 @@ Claude handles editing, git, tests, and codebase exploration directly. The shell
 
 ```bash
 git clone <your-repo-url> ~/Documents/Repos/dotfiles
-
-# Symlink what you want
-ln -sf ~/Documents/Repos/dotfiles/.config/tmux ~/.config/tmux
-ln -sf ~/Documents/Repos/dotfiles/.config/nvim ~/.config/nvim
-ln -sf ~/Documents/Repos/dotfiles/.config/starship.toml ~/.config/starship.toml
-ln -sf ~/Documents/Repos/dotfiles/.gitconfig ~/.gitconfig
-ln -sf ~/Documents/Repos/dotfiles/.config/glow/glow.yml ~/Library/Preferences/glow/glow.yml
-ln -sf ~/Documents/Repos/dotfiles/dev-scripts/dev-session ~/bin/dev-session
+cd ~/Documents/Repos/dotfiles
+./install.sh --dry-run   # see what would change
+./install.sh             # symlink configs, brew bundle, tmux + nvim plugins
 ```
+
+Anything the installer replaces is moved to `~/.dotfiles-backup/<timestamp>/`.
+Pass `--no-brew` to skip the Brewfile. Re-running is safe; links already in
+place are skipped.
 
 ## Recent Changes
 
