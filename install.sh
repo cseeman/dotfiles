@@ -30,6 +30,7 @@ LINKS="
 .gitignore_global|$HOME/.gitignore_global
 .gemrc|$HOME/.gemrc
 .tool-versions|$HOME/.tool-versions
+.default-gems|$HOME/.default-gems
 .config/tmux|$HOME/.config/tmux
 .config/nvim|$HOME/.config/nvim
 .config/starship.toml|$HOME/.config/starship.toml

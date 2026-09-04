@@ -118,6 +118,31 @@ if ts_ok then
     })
 end
 
+-- Ruby LSP through Neovim's built-in client. The server comes from
+-- `gem install ruby-lsp`; mise installs it into every new Ruby via
+-- ~/.default-gems.
+if vim.fn.executable('ruby-lsp') == 1 then
+    vim.lsp.config('ruby_lsp', {
+        cmd = { 'ruby-lsp' },
+        filetypes = { 'ruby', 'eruby' },
+        root_markers = { 'Gemfile', '.git' },
+    })
+    vim.lsp.enable('ruby_lsp')
+end
+vim.diagnostic.config({ virtual_text = true, severity_sort = true })
+
+-- Neovim 0.11 already maps grn, gra, grr, gri, K and [d ]d; these add the
+-- habitual ones.
+vim.api.nvim_create_autocmd('LspAttach', {
+    callback = function(args)
+        local opts = { buffer = args.buf, silent = true }
+        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+        vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
+        vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+        vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
+    end,
+})
+
 -- Line numbers
 vim.wo.number = true
 vim.wo.relativenumber = true
