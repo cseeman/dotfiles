@@ -1,7 +1,6 @@
 # ~/.gitconfig
 [user]
 	name = Christine Seeman
-	mail = christine.seeman@sofwarellc.com
 	email = christine.seeman@sofwarellc.com
 	signingkey = F5BB5808BF773AFD1BFD0DB996A6EDD21120FC7E
 [alias]
