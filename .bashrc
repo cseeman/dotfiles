@@ -2,9 +2,11 @@
 
 [[ $- == *i* ]] || return
 
-# Completions and prompt
-[[ -r /opt/homebrew/etc/bash_completion.d/git-completion.bash ]] \
-    && source /opt/homebrew/etc/bash_completion.d/git-completion.bash
+# Completions and prompt. bash-completion@2 loads each command's completion on
+# first use and needs bash 4.2+, so a stray /bin/bash pane just goes without.
+if (( BASH_VERSINFO[0] >= 4 )) && [[ -r /opt/homebrew/etc/profile.d/bash_completion.sh ]]; then
+    source /opt/homebrew/etc/profile.d/bash_completion.sh
+fi
 
 if command -v mise >/dev/null 2>&1; then
     eval "$(mise activate bash)"
