@@ -147,8 +147,8 @@ main() {
         cat "$STARSHIP_TOML" "$generated" > "$out"
     fi
 
-    mv "$out" "$STARSHIP_TOML"
-    rm -f "$generated"
+    cat "$out" > "$STARSHIP_TOML"   # write through the symlink rather than replacing it
+    rm -f "$out" "$generated"
     printf 'wrote palettes to %s\n' "$STARSHIP_TOML"
 }
 
