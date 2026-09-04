@@ -2,6 +2,13 @@
 
 `~/bin` is a symlink to this directory, so everything here is on PATH.
 
+## tmux-sessionizer
+
+`prefix + j` in tmux opens an fzf list of every directory under
+`~/Documents/Repos` (repos and sibling worktrees) and jumps to that project's
+`dev-session`, creating it on first use. Set `TMUX_SESSIONIZER_ROOTS` to a
+colon-separated list to look elsewhere.
+
 ## git-recent
 
 `git recent [n]` lists local branches by last commit, newest first, sized to
@@ -51,6 +58,7 @@ If the session already exists, it attaches to it.
 | `Ctrl-t -` | Split top and bottom |
 | `Ctrl-t c` | New window |
 | `Ctrl-t d` | Detach session |
+| `Ctrl-t j` | Jump to a project session (fzf) |
 | `Ctrl-t T` | Theme picker |
 | `Ctrl-t t` | Toggle status bar |
 | `Ctrl-t P` | Paste tmux buffer |

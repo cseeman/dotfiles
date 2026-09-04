@@ -1,4 +1,4 @@
-SHELL_SCRIPTS := install.sh bin/dev-session bin/git-recent \
+SHELL_SCRIPTS := install.sh bin/dev-session bin/git-recent bin/tmux-sessionizer \
 	.config/tmux/switch-theme.sh .config/tmux/bin/gen-starship-palettes.sh \
 	alacritty/switch-font.sh
 TMUX_CONFS := .config/tmux/config/options.conf .config/tmux/config/keybindings.conf \

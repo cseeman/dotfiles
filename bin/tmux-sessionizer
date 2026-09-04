@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# Pick a repo or worktree with fzf and jump to its dev-session, creating the
+# session if it does not exist. Bound to prefix + j in tmux.
+#
+# Roots are colon-separated directories whose immediate children are listed.
+# Worktrees created as siblings of their repo show up on their own.
+
+set -euo pipefail
+
+roots=${TMUX_SESSIONIZER_ROOTS:-$HOME/Documents/Repos}
+IFS=: read -ra root_dirs <<< "$roots"
+
+selected=$(fd --type d --min-depth 1 --max-depth 1 . "${root_dirs[@]}" \
+    | sed "s|^$HOME/|~/|; s|/$||" \
+    | fzf --prompt 'session> ' --reverse --height 100%) || exit 0
+
+exec dev-session "" "${selected/#\~/$HOME}"
