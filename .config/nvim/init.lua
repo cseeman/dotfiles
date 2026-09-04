@@ -60,8 +60,15 @@ Plug('rrethy/vim-hexokinase', { ['do'] = 'make hexokinase' })
 
 vim.call('plug#end')
 
--- Color scheme setup with error handling
-vim.o.background = "dark" -- or "light" for light mode
+-- switch-theme.sh writes "light" or "dark" here when the tmux theme changes.
+local function theme_mode()
+    local f = io.open(vim.fn.expand('~/.config/theme-mode'))
+    if not f then return 'dark' end
+    local mode = f:read('*l')
+    f:close()
+    return mode == 'light' and 'light' or 'dark'
+end
+vim.o.background = theme_mode()
 
 -- Safe color scheme loading
 local status_ok, gruvbox = pcall(require, "gruvbox")
@@ -91,8 +98,7 @@ vim.api.nvim_create_autocmd("FileType", {
     pattern = "gitcommit",
     callback = function()
         vim.wo.colorcolumn = "50,72"
-        -- Highlight the color columns for better visibility
-        vim.api.nvim_set_hl(0, "ColorColumn", { bg = "#3c3836" })
+        vim.api.nvim_set_hl(0, "ColorColumn", { link = "CursorLine" })
     end
 })
 

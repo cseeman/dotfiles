@@ -10,6 +10,10 @@
 # the config. Starship switches by rewriting its single `palette =` line, which
 # every shell picks up on its next prompt: Starship runs as a fresh process per
 # prompt and re-reads the config each time.
+#
+# The theme's mode (light or dark) is also written to ~/.config/theme-mode for
+# tools that only need to know that much: Neovim reads it for 'background', and
+# glow's style line is rewritten here directly.
 
 set -euo pipefail
 
@@ -22,6 +26,8 @@ readonly THEME_DIR="$TMUX_DIR/config"
 readonly REGISTRY="$TMUX_DIR/themes.registry"
 readonly ACTIVE_LINK="$THEME_DIR/theme.conf"
 readonly STARSHIP_TOML="${STARSHIP_TOML:-$HOME/.config/starship.toml}"
+readonly MODE_FILE="${THEME_MODE_FILE:-$HOME/.config/theme-mode}"
+readonly GLOW_YML="${GLOW_YML:-$HOME/Library/Preferences/glow/glow.yml}"
 
 # Muted greys for ANSI 7 and 8. Tools such as Claude Code use these for status
 # text; the terminal defaults are tuned for dark backgrounds and drop to ~2.3:1
@@ -121,6 +127,20 @@ apply_starship() {
     rm -f "$tmp"
 }
 
+apply_mode() {
+    mkdir -p "$(dirname "$MODE_FILE")"
+    printf '%s\n' "$1" > "$MODE_FILE"
+}
+
+apply_glow() {
+    local mode=$1 tmp
+    [[ -f $GLOW_YML ]] || return 0
+    tmp=$(mktemp)
+    sed "s/^style: .*/style: \"$mode\"/" "$GLOW_YML" > "$tmp"
+    cat "$tmp" > "$GLOW_YML"   # preserve the symlink rather than replacing it
+    rm -f "$tmp"
+}
+
 apply_ansi() {
     # Only meaningful when stdout is a terminal; from tmux run-shell these
     # would otherwise be captured as literal text.
@@ -155,8 +175,9 @@ cmd_current() {
     local theme palette
     theme=$(current_theme || printf '<unknown>')
     palette=$(current_palette || printf '<none>')
-    printf 'tmux theme:      %s\n' "$theme"
+    printf 'tmux theme:       %s\n' "$theme"
     printf 'starship palette: %s\n' "$palette"
+    printf 'mode:             %s\n' "$(cat "$MODE_FILE" 2>/dev/null || printf '<unset>')"
     if [[ $theme != "$palette" ]]; then
         printf '\nMismatch: run "%s %s" to bring them back in sync.\n' "$PROGRAM" "$theme"
         return 1
@@ -193,6 +214,8 @@ cmd_switch() {
 
     apply_tmux "$idx"
     [[ $SKIP_STARSHIP == 1 ]] || apply_starship "$name"
+    apply_mode "${THEME_MODES[$idx]}"
+    apply_glow "${THEME_MODES[$idx]}"
     apply_ansi "${THEME_MODES[$idx]}"
 
     printf 'Switched to %s (%s)\n' "$name" "${THEME_MODES[$idx]}"
@@ -202,7 +225,7 @@ cmd_switch() {
 
 usage() {
     cat <<USAGE
-$PROGRAM - switch the tmux theme and matching Starship palette together
+$PROGRAM - switch the tmux theme, Starship palette, and light/dark mode together
 
 Usage:
   $PROGRAM <theme>        switch to a theme

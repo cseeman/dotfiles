@@ -1,6 +1,7 @@
 # Theming
 
-One switcher changes the tmux theme and the Starship prompt palette together.
+One switcher changes the tmux theme, the Starship prompt palette, and the
+light/dark mode that glow and Neovim follow.
 
 ```
 ~/.config/tmux/switch-theme.sh equinox      # switch both
@@ -19,10 +20,15 @@ One switcher changes the tmux theme and the Starship prompt palette together.
 | `config/theme-*.conf` | One tmux theme each. Colors only. |
 | `config/theme.conf` | Symlink to the active theme. Not edited by hand. |
 | `../starship.toml` | Prompt config; holds every palette, one `palette =` line selects. |
+| `~/.config/theme-mode` | `light` or `dark`. Written on every switch, read by Neovim at startup. |
+| `../glow/glow.yml` | Its `style:` line is rewritten to the mode on every switch. |
 
 tmux switches by repointing `config/theme.conf` and sourcing the config.
 Starship switches by rewriting its `palette =` line, which every shell picks up
 on its next prompt, since Starship re-reads its config on each prompt render.
+
+Neovim reads the mode file when it starts, so an open editor keeps its
+background until restarted. glow picks the new style up on its next run.
 
 ## Adding a theme
 
