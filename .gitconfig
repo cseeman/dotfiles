@@ -63,6 +63,8 @@
 	recent10 = !/Users/christine/bin/git-recent10
 	recent = for-each-ref --sort=-committerdate --format=\"%(committerdate:relative)%09%(refname:short)\" --count=10 refs/heads/
 	reword = commit --amend --only
+[branch]
+	sort = -committerdate
 [column]
         ui = auto
 [commit]
