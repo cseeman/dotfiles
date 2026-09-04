@@ -13,3 +13,6 @@
 Icon?
 ehthumbs.db
 Thumbs.db
+
+# Claude Code per-machine permissions
+**/.claude/settings.local.json

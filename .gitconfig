@@ -70,6 +70,7 @@
 	verbose = true
 [core]
 	editor = nvim
+	excludesfile = ~/.gitignore_global
 [diff]
         algorithm = histogram
         colorMoved = plain
