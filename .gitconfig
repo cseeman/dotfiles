@@ -9,7 +9,7 @@
   co     = checkout
   can    = commit --amend --no-edit
   cp     = cherry-pick
-  dm     = diff --patience master
+  dm     = diff main
   b      = branch
   prb    = pull --rebase
   pf     = push --force-with-lease
