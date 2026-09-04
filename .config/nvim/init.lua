@@ -43,6 +43,9 @@ Plug('https://github.com/tpope/vim-rails')
 vim.opt.rtp:append('/opt/homebrew/opt/fzf')
 Plug('junegunn/fzf.vim')
 
+-- Treesitter, main branch: parsers are compiled by the tree-sitter CLI
+Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
+
 -- Gruvbox Theme - making it pretty
 Plug 'ellisonleao/gruvbox.nvim'
 
@@ -87,6 +90,32 @@ else
     -- Fallback to a built-in color scheme
     vim.cmd("colorscheme desert")
     print("Gruvbox not found, using fallback colorscheme")
+end
+
+-- Treesitter highlighting and indentation. Parsers missing from the list are
+-- installed in the background on startup.
+local ts_langs = {
+    'ruby', 'embedded_template', 'lua', 'bash', 'javascript', 'html', 'css',
+    'yaml', 'json', 'markdown', 'markdown_inline', 'toml', 'vim', 'vimdoc',
+}
+local ts_ok, treesitter = pcall(require, 'nvim-treesitter')
+if ts_ok then
+    vim.treesitter.language.register('embedded_template', 'eruby')
+    local missing = vim.tbl_filter(function(lang)
+        local ok, loaded = pcall(vim.treesitter.language.add, lang)
+        return not (ok and loaded)
+    end, ts_langs)
+    if #missing > 0 then treesitter.install(missing) end
+    vim.api.nvim_create_autocmd('FileType', {
+        pattern = {
+            'ruby', 'eruby', 'lua', 'sh', 'bash', 'javascript', 'html', 'css',
+            'yaml', 'json', 'markdown', 'toml', 'vim',
+        },
+        callback = function()
+            pcall(vim.treesitter.start)
+            vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+    })
 end
 
 -- Line numbers

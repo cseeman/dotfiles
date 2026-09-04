@@ -21,6 +21,7 @@ brew "pinentry-mac"
 # Terminal
 brew "tmux"
 brew "neovim"
+brew "tree-sitter-cli"  # compiles nvim-treesitter parsers
 brew "glow"
 brew "go"          # vim-hexokinase builds its helper with Go
 
