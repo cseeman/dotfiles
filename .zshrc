@@ -16,3 +16,6 @@ fi
 
 alias vim="nvim"
 alias dev="dev-session"
+
+# Machine-specific additions, not tracked
+[[ -r ~/.zshrc.local ]] && source ~/.zshrc.local

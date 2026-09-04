@@ -84,6 +84,11 @@ The installer, in order:
 
 Re-running is safe; links already in place are skipped.
 
+Machine-specific settings stay out of the repo: `~/.bashrc.local`,
+`~/.zshrc.local`, and `~/.gitconfig.local` are sourced or included when
+present. The installer seeds `~/.gitconfig.local` with a `github.user` line,
+which `.bashrc` uses to hand Bundler a GitHub Packages credential.
+
 `make check` lints the shell scripts, sources every tmux config into a scratch
 server, and starts Neovim headless. Run it before committing.
 

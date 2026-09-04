@@ -21,13 +21,15 @@ if command -v starship >/dev/null 2>&1; then
     eval "$(starship init bash)"
 fi
 
-# Bundler cannot read gh's keyring, so private SOFware gems need the credential
-# passed explicitly (host uppercased, dots doubled to underscores). Skip when a
-# parent shell already exported it so nested panes do not each hit the keychain.
+# Bundler cannot read gh's keyring, so private GitHub gems need the credential
+# passed explicitly (host uppercased, dots doubled to underscores). The login
+# comes from github.user in ~/.gitconfig.local. Skip when a parent shell
+# already exported it so nested panes do not each hit the keychain.
 if [[ -z ${BUNDLE_RUBYGEMS__PKG__GITHUB__COM:-} ]] && command -v gh >/dev/null 2>&1; then
-    _gh_token=$(gh auth token 2>/dev/null)
-    [ -n "$_gh_token" ] && export BUNDLE_RUBYGEMS__PKG__GITHUB__COM="cseeman:$_gh_token"
-    unset _gh_token
+    _gh_user=$(git config --get github.user 2>/dev/null || true)
+    _gh_token=$(gh auth token 2>/dev/null || true)
+    [[ -n $_gh_user && -n $_gh_token ]] && export BUNDLE_RUBYGEMS__PKG__GITHUB__COM="$_gh_user:$_gh_token"
+    unset _gh_user _gh_token
 fi
 
 # Aliases
@@ -52,3 +54,6 @@ glow() {
         command glow "$@"
     fi
 }
+
+# Machine-specific additions, not tracked
+[[ -r ~/.bashrc.local ]] && source ~/.bashrc.local

@@ -99,3 +99,6 @@
 [rerere]
 	enabled = true
 	autoUpdate = true
+# Machine-specific settings (github.user, work identity). Later wins.
+[include]
+	path = ~/.gitconfig.local
