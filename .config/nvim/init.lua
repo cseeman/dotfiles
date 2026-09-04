@@ -105,11 +105,12 @@ vim.g.fzf_action = {
     ['ctrl-v'] = 'vsplit'
 }
 
--- Key mappings for FZF
+-- Key mappings for FZF. Buffers and grep sit under leader so C-b and C-f keep
+-- paging.
 vim.keymap.set('n', '<C-p>', ':Files<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<C-g>', ':GFiles<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<C-b>', ':Buffers<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<C-f>', ':Rg<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>b', ':Buffers<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>f', ':Rg<CR>', { noremap = true, silent = true })
 
 -- General key mappings
 vim.keymap.set('n', '<leader>w', ':w<CR>', { noremap = true, silent = true })
