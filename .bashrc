@@ -5,9 +5,28 @@
 # Completions and prompt
 [[ -r /opt/homebrew/etc/bash_completion.d/git-completion.bash ]] \
     && source /opt/homebrew/etc/bash_completion.d/git-completion.bash
-eval "$(mise completion bash)"
-eval "$(fzf --bash)"
-eval "$(starship init bash)"
+
+if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate bash)"
+    eval "$(mise completion bash)"
+fi
+
+if command -v fzf >/dev/null 2>&1; then
+    eval "$(fzf --bash)"
+fi
+
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init bash)"
+fi
+
+# Bundler cannot read gh's keyring, so private SOFware gems need the credential
+# passed explicitly (host uppercased, dots doubled to underscores). Skip when a
+# parent shell already exported it so nested panes do not each hit the keychain.
+if [[ -z ${BUNDLE_RUBYGEMS__PKG__GITHUB__COM:-} ]] && command -v gh >/dev/null 2>&1; then
+    _gh_token=$(gh auth token 2>/dev/null)
+    [ -n "$_gh_token" ] && export BUNDLE_RUBYGEMS__PKG__GITHUB__COM="cseeman:$_gh_token"
+    unset _gh_token
+fi
 
 # Aliases
 alias vim="nvim"
