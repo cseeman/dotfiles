@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#
+# Recently active local branches, newest first.
+# Usage: git recent [count]   (default: as many as fit the terminal)
+
+set -euo pipefail
+
+count=${1:-}
+if [[ -z $count ]]; then
+    count=$(( $(tput lines 2>/dev/null || echo 20) - 3 ))
+    (( count >= 5 )) || count=5
+fi
+
+git branch --sort=-committerdate \
+    --format='%(committerdate:relative)%09%(refname:short)' | head -n "$count"
