@@ -8,7 +8,8 @@ set -euo pipefail
 
 DOTFILES=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 readonly DOTFILES
-readonly BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
+BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
+readonly BACKUP_DIR
 readonly TPM_DIR="$DOTFILES/.config/tmux/plugins/tpm"
 readonly PLUG_VIM="$HOME/.local/share/nvim/site/autoload/plug.vim"
 readonly DEFAULT_THEME="equinox-dawn"

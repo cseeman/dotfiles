@@ -141,6 +141,7 @@ apply_glow() {
     rm -f "$tmp"
 }
 
+# shellcheck disable=SC1003  # the \\ is the OSC string terminator, not a quote
 apply_ansi() {
     # Only meaningful when stdout is a terminal; from tmux run-shell these
     # would otherwise be captured as literal text.
