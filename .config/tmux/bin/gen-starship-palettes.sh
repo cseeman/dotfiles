@@ -115,7 +115,7 @@ main() {
     [[ -f "$STARSHIP_TOML" ]] || die "starship config not found: $STARSHIP_TOML"
     command -v tmux >/dev/null || die "tmux not found"
 
-    tmux -L "$SOCKET" new-session -d "sleep 120" 2>/dev/null \
+    tmux -L "$SOCKET" -f /dev/null new-session -d "sleep 120" 2>/dev/null \
         || die "could not start scratch tmux server"
 
     local generated

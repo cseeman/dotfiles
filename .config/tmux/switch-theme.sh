@@ -84,7 +84,7 @@ current_palette() {
 # would otherwise take the live config down with it.
 validate_theme() {
     local file=$1 socket="theme-check-$$" output
-    tmux -L "$socket" new-session -d "sleep 5" >/dev/null 2>&1 \
+    tmux -L "$socket" -f /dev/null new-session -d "sleep 5" >/dev/null 2>&1 \
         || { warn "could not start scratch tmux server; skipping validation"; return 0; }
     output=$(tmux -L "$socket" source-file "$file" 2>&1) || true
     tmux -L "$socket" kill-server >/dev/null 2>&1 || true
