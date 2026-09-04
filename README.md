@@ -26,10 +26,21 @@ Primarily for me (hi future Christine!), but if you're a Ruby dev who lives in t
 | `tokyo` | dark | Blue/purple, the original |
 | `catppuccin` | dark | Soft pastels |
 | `everforest` | dark | Nature-inspired, best readability for diffs |
+| `solstice` | dark | Tropical ocean at dusk |
+| `equinox` | dark | Woodsmoke and late harvest |
+| `original` | dark | The first saved theme, a Catppuccin variant |
 | `latte` | light | Catppuccin light variant |
 | `rosepine-dawn` | light | Warm cream, high contrast for reading AI output |
 | `gruvbox-light` | light | Warm neutral, highest contrast for terminal tools |
+| `solstice-dawn` | light | Sunrise on the beach |
+| `equinox-dawn` | light | Light through turning leaves |
 
+Switching a theme also sets the Starship palette, glow's style, and Neovim's
+background to match. Details in `.config/tmux/THEMES.md`.
+
+### Alacritty
+- `alacritty/alacritty.toml` - Window, shell, and theme import
+- `alacritty/fonts/` - One file per font; `switch-font.sh <name>` picks one
 
 ### AI Workflow
 - `dev-scripts/dev-session` - Sets up a 2-pane tmux layout: shell + Claude
@@ -64,13 +75,8 @@ Anything the installer replaces is moved to `~/.dotfiles-backup/<timestamp>/`.
 Pass `--no-brew` to skip the Brewfile. Re-running is safe; links already in
 place are skipped.
 
-## Recent Changes
-
-- **2-pane layout** (Feb 2026) - Shell + Claude replaces the old 4-pane setup
-- **mise migration** - Replaced asdf and nodenv
-- **Worktree aliases** - `git wclean`, `git wlist`, `git wt-status`
-- **Everforest + Rose Pine Dawn themes** (Feb 2026) - Readability-focused dark and light options
-- **Theme system** (Aug 2025) - Coordinated themes across tmux and Starship
+`make check` lints the shell scripts, sources every tmux config into a scratch
+server, and starts Neovim headless. Run it before committing.
 
 ---
 
