@@ -13,8 +13,18 @@ if command -v mise >/dev/null 2>&1; then
     eval "$(mise completion bash)"
 fi
 
+# fzf walks with fd so it respects .gitignore, and previews files with bat.
+# Neovim's :Files picks up FZF_DEFAULT_COMMAND too.
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range :200 {}'"
 if command -v fzf >/dev/null 2>&1; then
     eval "$(fzf --bash)"
+fi
+
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init bash)"
 fi
 
 if command -v starship >/dev/null 2>&1; then
@@ -34,6 +44,12 @@ fi
 
 # Aliases
 alias vim="nvim"
+if command -v eza >/dev/null 2>&1; then
+    alias ls='eza --group-directories-first'
+    alias ll='eza -l --git --group-directories-first'
+    alias la='eza -la --git --group-directories-first'
+    alias lt='eza --tree --level=2 --group-directories-first'
+fi
 alias dev="dev-session"
 alias cl='clear'
 alias cls='clear && tmux clear-history 2>/dev/null || clear'

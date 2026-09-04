@@ -7,6 +7,9 @@ brew "starship"
 brew "fzf"
 brew "fd"
 brew "ripgrep"
+brew "bat"       # fzf previews and a paging cat
+brew "eza"       # ls with git status and tree
+brew "zoxide"    # cd that learns
 brew "mise"
 
 # Git
