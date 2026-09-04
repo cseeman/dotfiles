@@ -43,7 +43,8 @@ style, and Neovim's background to match. Details in `.config/tmux/THEMES.md`.
 - `alacritty/fonts/` - One file per font; `switch-font.sh <name>` picks one
 
 ### AI Workflow
-- `dev-scripts/dev-session` - Sets up a 2-pane tmux layout: shell + Claude
+- `bin/dev-session` - Sets up a 2-pane tmux layout: shell + Claude (docs in `bin/README.md`)
+- `bin/git-recent*` - Recently active branches, sized to the terminal
 - `.claude/` - Claude Code preferences (code style, git workflow, PR conventions)
 
 ### Git

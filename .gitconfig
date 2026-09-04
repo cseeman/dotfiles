@@ -58,9 +58,9 @@
   }; f"
   ps = push origin HEAD
 	recent-pager = !git branch --sort=-committerdate --format=\"%(committerdate:relative)%09%(refname:short)\" | less -FX
-	recents = !/Users/christine/bin/git-recent-smart
-	recent5 = !/Users/christine/bin/git-recent5
-	recent10 = !/Users/christine/bin/git-recent10
+	recents = !git-recent-smart
+	recent5 = !git-recent5
+	recent10 = !git-recent10
 	recent = for-each-ref --sort=-committerdate --format=\"%(committerdate:relative)%09%(refname:short)\" --count=10 refs/heads/
 	reword = commit --amend --only
 [branch]

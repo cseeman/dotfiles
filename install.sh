@@ -37,7 +37,7 @@ LINKS="
 alacritty/alacritty.toml|$HOME/.config/alacritty/alacritty.toml
 .claude/CLAUDE.md|$HOME/.claude/CLAUDE.md
 .claude/CLAUDE-user-preferences.md|$HOME/.claude/CLAUDE-user-preferences.md
-dev-scripts/dev-session|$HOME/bin/dev-session
+bin|$HOME/bin
 "
 
 usage() {

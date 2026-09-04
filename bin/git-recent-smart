@@ -1,0 +1,16 @@
+#!/bin/bash
+# Smart git recent that adapts to terminal height
+
+# Get terminal height
+HEIGHT=$(tput lines)
+
+# Calculate how many branches to show (leave 3 lines for prompt/padding)
+BRANCH_COUNT=$((HEIGHT - 3))
+
+# Minimum of 5 branches
+if [ "$BRANCH_COUNT" -lt 5 ]; then
+    BRANCH_COUNT=5
+fi
+
+# Show branches
+git branch --sort=-committerdate --format="%(committerdate:relative)%09%(refname:short)" | head -"$BRANCH_COUNT"

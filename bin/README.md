@@ -1,3 +1,13 @@
+# Personal scripts
+
+`~/bin` is a symlink to this directory, so everything here is on PATH.
+
+## git-recent
+
+`git recent [n]` lists local branches by last commit, newest first, sized to
+the terminal when no count is given. `git recents`, `recent5`, and `recent10`
+are aliases onto it.
+
 # Dev Session - Tmux + Claude Code
 
 ## Layout
