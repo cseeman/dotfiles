@@ -30,7 +30,6 @@ vim.opt.timeoutlen = 300               -- Faster key sequence completion
 vim.call('plug#begin')
 -- Shorthand notation for GitHub; translates to https://github.com/junegunn/seoul256.vim.git
 -- Plug('junegunn/seoul256.vim')
-Plug('https://github.com/tpope/vim-sensible.git')
 Plug('nvim-tree/nvim-web-devicons')
 -- Any valid git URL is allowed
 Plug('https://github.com/junegunn/vim-easy-align.git')
