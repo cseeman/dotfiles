@@ -66,16 +66,22 @@ Claude handles editing, git, tests, and codebase exploration directly. The shell
 ## Quick Start
 
 ```bash
-git clone <your-repo-url> ~/Documents/Repos/dotfiles
+git clone git@github.com:cseeman/dotfiles.git ~/Documents/Repos/dotfiles
 cd ~/Documents/Repos/dotfiles
 ./install.sh --dry-run   # see what would change
-./install.sh             # symlink configs, brew bundle, tmux + nvim plugins,
-                         # default theme and font
+./install.sh
 ```
 
-Anything the installer replaces is moved to `~/.dotfiles-backup/<timestamp>/`.
-Pass `--no-brew` to skip the Brewfile. Re-running is safe; links already in
-place are skipped.
+The installer, in order:
+
+1. Symlinks every config into `$HOME`, moving anything it replaces to `~/.dotfiles-backup/<timestamp>/`.
+2. Runs `brew bundle` from the Brewfile (skip with `--no-brew`).
+3. Clones tpm and installs the tmux plugins.
+4. Clones the alacritty-theme collection.
+5. Sets the default tmux theme (equinox-dawn) and Alacritty font (Maple) if none is active.
+6. Fetches vim-plug and installs the Neovim plugins.
+
+Re-running is safe; links already in place are skipped.
 
 `make check` lints the shell scripts, sources every tmux config into a scratch
 server, and starts Neovim headless. Run it before committing.
