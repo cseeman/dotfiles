@@ -17,3 +17,5 @@
 *.old
 *.backup
 old_*
+# Active theme pointer, set by switch-theme.sh
+.config/tmux/config/theme.conf
