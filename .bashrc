@@ -51,6 +51,7 @@ if command -v eza >/dev/null 2>&1; then
     alias lt='eza --tree --level=2 --group-directories-first'
 fi
 alias dev="dev-session"
+alias cheat='glow "$HOME/Documents/Repos/dotfiles/CHEATSHEET.md"'
 alias cl='clear'
 alias cls='clear && tmux clear-history 2>/dev/null || clear'
 

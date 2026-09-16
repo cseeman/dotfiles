@@ -51,6 +51,9 @@ style, and Neovim's background to match. Details in `.config/tmux/THEMES.md`.
 - `.gitconfig` - Aliases (`git pf`, `git can`, `git up`), worktree helpers (`git wclean`, `git wlist`), GPG signing
 - Stacked-branch defaults: `rebase.updateRefs`, `autoSquash`, `autoStash`, `rerere`, `push.autoSetupRemote`
 
+`CHEATSHEET.md` lists the keys and commands worth remembering; `cheat` opens it
+in glow from any shell.
+
 ## The Layout
 
 ```

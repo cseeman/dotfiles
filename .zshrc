@@ -24,6 +24,7 @@ fi
 
 alias vim="nvim"
 alias dev="dev-session"
+alias cheat='glow "$HOME/Documents/Repos/dotfiles/CHEATSHEET.md"'
 if command -v eza >/dev/null 2>&1; then
     alias ls='eza --group-directories-first'
     alias ll='eza -l --git --group-directories-first'
