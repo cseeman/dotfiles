@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+#
+# Where your PR attention went: authored vs reviewed by month, flagging the
+# ones that touch an architectural decision surface.
+# Usage: pr-surfaces [--months N] [--json]
+#
+# Reviews are bucketed by when you submitted the review, not when the PR was
+# opened. GitHub search has no date qualifier for review events, so the months
+# here come from each review's own timestamp.
+
+set -euo pipefail
+
+# shellcheck source=/dev/null
+[[ -r ~/.pr-tools.local ]] && source ~/.pr-tools.local
+repos=${PR_WAITING_REPOS:-}
+surfaces=${PR_WAITING_SURFACES:-'^(docs/adr/|db/migrate/)'}
+me=${PR_WAITING_USER:-$(gh api user --jq .login)}
+
+months=6
+as_json=false
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --months) months=$2; shift 2 ;;
+        --json)   as_json=true; shift ;;
+        -h|--help) sed -n '3,9p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        *) echo "unknown option: $1" >&2; exit 1 ;;
+    esac
+done
+
+[[ -n $repos ]] || { echo "pr-surfaces: set PR_WAITING_REPOS in ~/.pr-tools.local, see bin/README.md" >&2; exit 1; }
+
+since=$(date -v-"${months}"m -v1d +%Y-%m-%d)
+scope=""
+for repo in $repos; do
+    scope="$scope repo:$repo"
+done
+
+read -r -d '' gql <<'EOF' || true
+query($q: String!, $cursor: String) {
+  search(query: $q, type: ISSUE, first: 50, after: $cursor) {
+    pageInfo { hasNextPage endCursor }
+    nodes {
+      ... on PullRequest {
+        number createdAt
+        repository { nameWithOwner }
+        author { login }
+        files(first: 100) { nodes { path } }
+        reviews(first: 50) { nodes { author { login } submittedAt } }
+      }
+    }
+  }
+}
+EOF
+
+workdir=$(mktemp -d)
+trap 'rm -rf "$workdir"' EXIT
+
+# Walk every page of a search, appending each page's nodes to a file. Pages go to
+# disk, not a shell variable: a wide --months overflows ARG_MAX otherwise.
+fetch_all() {
+    local query=$1 out=$2 cursor="" page tries
+    : > "$out"
+    while :; do
+        tries=0
+        while :; do
+            if [[ -z $cursor ]]; then
+                page=$(gh api graphql -F q="$query" -f query="$gql" 2>/dev/null) || page=""
+            else
+                page=$(gh api graphql -F q="$query" -F cursor="$cursor" -f query="$gql" 2>/dev/null) || page=""
+            fi
+            [[ -n $page ]] && jq -e '.data.search' >/dev/null 2>&1 <<<"$page" && break
+            tries=$((tries + 1))
+            if (( tries >= 4 )); then
+                echo "pr-surfaces: GitHub API failed after $tries attempts" >&2
+                exit 1
+            fi
+            sleep $(( tries * 3 ))
+        done
+        jq -c '.data.search.nodes' <<<"$page" >> "$out"
+        [[ $(jq -r '.data.search.pageInfo.hasNextPage' <<<"$page") == true ]] || break
+        cursor=$(jq -r '.data.search.pageInfo.endCursor' <<<"$page")
+    done
+}
+
+fetch_all "is:pr author:$me created:>=$since$scope"      "$workdir/authored.json"
+fetch_all "is:pr reviewed-by:$me created:>=$since$scope" "$workdir/reviewed.json"
+
+rollup=$(jq -n \
+    --slurpfile authored_pages "$workdir/authored.json" \
+    --slurpfile reviewed_pages "$workdir/reviewed.json" \
+    --arg me "$me" \
+    --arg surfaces "$surfaces" '
+def surface: [.files.nodes[].path | select(test($surfaces))] | length > 0;
+
+(($authored_pages | add) // []) as $authored
+| (($reviewed_pages | add) // []) as $reviewed
+
+| ($authored | map({ month: (.createdAt | fromdate | strftime("%Y-%m")), surface: surface })) as $arows
+
+| ($reviewed
+    | map(select(.author.login != $me))
+    | map(select(.author.login | test("bot$|\\[bot\\]|dependabot"; "i") | not))
+    | map({ mine: ([.reviews.nodes[] | select(.author.login == $me) | .submittedAt] | sort | first), surface: surface })
+    | map(select(.mine != null))
+    | map({ month: (.mine | fromdate | strftime("%Y-%m")), surface: .surface })) as $rrows
+
+| ($arows | group_by(.month) | map({ key: .[0].month, value: { authored: length, authored_surface: (map(select(.surface)) | length) } }) | from_entries) as $a
+| ($rrows | group_by(.month) | map({ key: .[0].month, value: { reviewed: length, reviewed_surface: (map(select(.surface)) | length) } }) | from_entries) as $r
+| [ (($a | keys) + ($r | keys)) | unique | .[] as $m
+    | { month: $m,
+        authored:         ($a[$m].authored // 0),
+        authored_surface: ($a[$m].authored_surface // 0),
+        reviewed:         ($r[$m].reviewed // 0),
+        reviewed_surface: ($r[$m].reviewed_surface // 0) } ]
+| sort_by(.month)')
+
+if $as_json; then
+    echo "$rollup"
+    exit 0
+fi
+
+{
+    printf 'MONTH\tAUTHORED\tON SURFACE\tREVIEWED\tON SURFACE\tRATIO\n'
+    jq -r '.[] | [
+        (if .month == (now|strftime("%Y-%m")) then .month + " *" else .month end),
+        (.authored | tostring),
+        "\(.authored_surface)",
+        (.reviewed | tostring),
+        "\(.reviewed_surface)",
+        (if .authored == 0 then "-" else "1:\((.reviewed / .authored) * 10 | round / 10)" end)
+    ] | @tsv' <<<"$rollup"
+    jq -r '[ .[] | .authored ] as $a | [ .[] | .reviewed ] as $r
+        | ["TOTAL", ($a|add|tostring), ([.[].authored_surface]|add|tostring),
+           ($r|add|tostring), ([.[].reviewed_surface]|add|tostring),
+           (if ($a|add) == 0 then "-" else "1:\((($r|add) / ($a|add)) * 10 | round / 10)" end)] | @tsv' <<<"$rollup"
+} | column -t -s $'\t'
+
+echo
+echo "* month in progress. Reviews bucket on your review date, not the PR's open date."

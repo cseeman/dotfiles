@@ -79,3 +79,50 @@ dev-session                      # session named project-feature-name
 
 git wclean ../project-feature-name   # remove worktree, delete branch, prune
 ```
+
+## pr-waiting
+
+`pr-waiting` lists open PRs across your configured repos that are still
+waiting on a review from you, oldest first, flagging the ones that touch an
+architectural surface (ADRs and migrations by default).
+
+Review requests in these repos land on teams, not individuals, and GitHub
+does not clear a team request once a teammate reviews. The raw list is
+therefore mostly noise, so by default the script drops drafts, bot-authored
+PRs, and anything you have already reviewed.
+
+| Flag | Effect |
+|------|--------|
+| `--all` | No filtering, the raw team queue |
+| `--drafts` | Include draft PRs |
+| `--json` | Machine-readable output |
+
+Work-specific values live in the untracked `~/.pr-tools.local`, which the
+PR scripts source:
+
+```bash
+PR_WAITING_REPOS=${PR_WAITING_REPOS:-"your-org/app-one your-org/app-two"}
+PR_WAITING_SURFACES=${PR_WAITING_SURFACES:-'^(docs/adr/|db/migrate/|app/graphql/)'}
+PR_REREVIEW_ORG=your-org
+```
+
+`PR_WAITING_REPOS` is required. The `${VAR:-...}` form lets a value set for
+one run win over the file. `PR_WAITING_USER` overrides the GitHub login.
+
+## pr-surfaces
+
+`pr-surfaces` shows where your PR attention went across your configured repos,
+month by month: how much you authored, how much you reviewed, and how much of
+each touched an architectural decision surface.
+
+Reviews bucket on the date you submitted the review. GitHub search has no
+date qualifier for review events, so a monthly count taken from search alone
+silently buckets by the PR's open date instead, which is a different number.
+
+| Flag | Effect |
+|------|--------|
+| `--months N` | Window size, default 6, snapped to month boundaries |
+| `--json` | Machine-readable output |
+
+Shares `PR_WAITING_REPOS`, `PR_WAITING_SURFACES`, and `PR_WAITING_USER` with
+`pr-waiting`. Takes about 30s, since it walks every page of both searches.

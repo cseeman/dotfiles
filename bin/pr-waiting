@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+#
+# Open PRs still waiting on a review from you, oldest first.
+# Usage: pr-waiting [--all] [--drafts] [--json]
+#
+# Review requests here land on teams, not individuals, and GitHub does not
+# clear a team request when a teammate reviews. The default filters exist to
+# turn that team firehose back into a personal queue.
+
+set -euo pipefail
+
+# shellcheck source=/dev/null
+[[ -r ~/.pr-tools.local ]] && source ~/.pr-tools.local
+repos=${PR_WAITING_REPOS:-}
+surfaces=${PR_WAITING_SURFACES:-'^(docs/adr/|db/migrate/)'}
+me=${PR_WAITING_USER:-$(gh api user --jq .login)}
+
+include_drafts=false
+no_filter=false
+as_json=false
+for arg in "$@"; do
+    case $arg in
+        --drafts) include_drafts=true ;;
+        --all)    include_drafts=true; no_filter=true ;;
+        --json)   as_json=true ;;
+        -h|--help) sed -n '3,8p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        *) echo "unknown option: $arg" >&2; exit 1 ;;
+    esac
+done
+
+[[ -n $repos ]] || { echo "pr-waiting: set PR_WAITING_REPOS in ~/.pr-tools.local, see bin/README.md" >&2; exit 1; }
+
+query="is:open is:pr review-requested:$me"
+for repo in $repos; do
+    query="$query repo:$repo"
+done
+
+read -r -d '' gql <<'EOF' || true
+query($q: String!) {
+  search(query: $q, type: ISSUE, first: 100) {
+    nodes {
+      ... on PullRequest {
+        number title url isDraft createdAt
+        repository { nameWithOwner }
+        author { login }
+        files(first: 100) { nodes { path } }
+        reviews(first: 50) { nodes { author { login } } }
+      }
+    }
+  }
+}
+EOF
+
+raw=$(gh api graphql -F q="$query" -f query="$gql")
+
+filtered=$(jq \
+    --arg me "$me" \
+    --arg surfaces "$surfaces" \
+    --argjson drafts "$include_drafts" \
+    --argjson all "$no_filter" '
+[ .data.search.nodes[]
+  | select($drafts or (.isDraft | not))
+  | select($all or (.author.login | test("bot$|\\[bot\\]|dependabot"; "i") | not))
+  | ([.reviews.nodes[].author.login] | map(select(test("bot|copilot"; "i") | not)) | unique) as $reviewers
+  | select($all or ($reviewers | index($me) | not))
+  | {
+      repo:     (.repository.nameWithOwner | sub("^[^/]+/"; "")),
+      number:   .number,
+      title:    .title,
+      url:      .url,
+      author:   .author.login,
+      draft:    .isDraft,
+      age_days: (((now - (.createdAt | fromdate)) / 86400) | floor),
+      others:   ($reviewers | map(select(. != $me)) | length),
+      surface:  ([.files.nodes[].path | select(test($surfaces))] | length > 0)
+    }
+] | sort_by(-.age_days)' <<<"$raw")
+
+if $as_json; then
+    echo "$filtered"
+    exit 0
+fi
+
+count=$(jq 'length' <<<"$filtered")
+if [[ $count -eq 0 ]]; then
+    echo "Nothing waiting on you."
+    exit 0
+fi
+
+{
+    printf 'PR\tAGE\tAUTHOR\tSEEN\tSURFACE\tTITLE\n'
+    jq -r '.[] | [
+        "\(.repo)#\(.number)",
+        "\(.age_days)d",
+        .author,
+        (if .others == 0 then "untouched" else "\(.others) reviewer(s)" end),
+        (if .surface then "decision" else "-" end),
+        (.title | if length > 60 then .[0:57] + "..." else . end)
+    ] | @tsv' <<<"$filtered"
+} | column -t -s $'\t'
+
+echo
+echo "$count waiting. Untouched by anyone: $(jq '[.[] | select(.others == 0)] | length' <<<"$filtered")"
