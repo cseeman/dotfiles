@@ -38,13 +38,18 @@ dev-session
 dev-session my-session-name
 dev-session session-name /path/to/project
 
+# In the branch's own worktree, created beside the repo if needed
+dev-session -w feature-name
+
 # Or manually
 tmux new-session -s feature-name
 Ctrl-t |    # Split side by side
 ```
 
-Run from inside tmux, `dev-session` switches to the session instead of nesting.
-If the session already exists, it attaches to it.
+Each worktree gets one session, named after its directory, so the name stays
+true when the branch changes. Run from inside tmux, `dev-session` switches to the
+session instead of nesting. If the session already exists it attaches, and says
+so when that session lives in a different directory.
 
 ## Tmux Quick Reference
 
@@ -52,7 +57,7 @@ If the session already exists, it attaches to it.
 
 | Key | Action |
 |-----|--------|
-| `Ctrl-h/j/k/l` | Navigate panes (vim-tmux-navigator) |
+| `Ctrl-h/j/k/l` | Navigate panes (vim-tmux-navigator); `Ctrl-j` stays with Claude |
 | `Ctrl-t z` | Zoom/unzoom pane |
 | `Ctrl-t \|` | Split side by side |
 | `Ctrl-t -` | Split top and bottom |
@@ -73,9 +78,8 @@ Sessions survive sleep/wake. Detach and reattach with `tmux attach -t session-na
 ## Git Worktree Workflow
 
 ```bash
-git worktree add ../project-feature-name branch-name
-cd ../project-feature-name
-dev-session                      # session named project-feature-name
+cd project
+dev-session -w feature-name      # worktree and session project-feature-name
 
 git wclean ../project-feature-name   # remove worktree, delete its branch if merged
 ```
@@ -108,6 +112,14 @@ PR_REREVIEW_ORG=your-org
 
 `PR_WAITING_REPOS` is required. The `${VAR:-...}` form lets a value set for
 one run win over the file. `PR_WAITING_USER` overrides the GitHub login.
+
+## pr-rereview
+
+`pr-rereview` lists open PRs you reviewed that may need another look: not yet
+approved, or re-requested since you approved. Each shows what changed since your
+last review, most urgent first. `pr-rereview-notify` runs it on weekday mornings
+through the launch agent in `launchd/` and only notifies when something needs you.
+Pass an org, or set `PR_REREVIEW_ORG` in `~/.pr-tools.local`.
 
 ## pr-surfaces
 
