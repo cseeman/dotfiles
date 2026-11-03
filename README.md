@@ -89,8 +89,11 @@ Re-running is safe; links already in place are skipped.
 
 Machine-specific settings stay out of the repo: `~/.bashrc.local`,
 `~/.zshrc.local`, and `~/.gitconfig.local` are sourced or included when
-present. The installer seeds `~/.gitconfig.local` with a `github.user` line,
-which `.bashrc` uses to hand Bundler a GitHub Packages credential.
+present. `~/.pr-tools.local` holds the repos the PR scripts query, see
+`bin/README.md`.
+
+Private GitHub gems need a classic PAT with only `read:packages`, stored once:
+`bundle config set --global rubygems.pkg.github.com <login>:<pat>`.
 
 `make check` lints the shell scripts, sources every tmux config into a scratch
 server, and starts Neovim headless. Run it before committing.

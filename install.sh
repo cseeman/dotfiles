@@ -134,17 +134,6 @@ select_font() {
     run "$DOTFILES/alacritty/switch-font.sh" "$DEFAULT_FONT"
 }
 
-seed_local_overrides() {
-    printf '\nLocal overrides\n'
-    local f="$HOME/.gitconfig.local"
-    if [[ -e $f ]]; then
-        log "ok" "$f"
-        return 0
-    fi
-    run sh -c "printf '[github]\n\t# user = your-github-login\n' > '$f'"
-    log "create" "$f (fill in github.user)"
-}
-
 # Copied, not linked: launchd does not reliably load symlinked agents.
 install_launch_agent() {
     printf '\nLaunch agents\n'
@@ -195,7 +184,6 @@ main() {
     install_alacritty_themes
     select_theme
     select_font
-    seed_local_overrides
     install_vim_plug
     install_launch_agent
 
