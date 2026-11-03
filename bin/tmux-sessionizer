@@ -11,7 +11,7 @@ set -euo pipefail
 roots=${TMUX_SESSIONIZER_ROOTS:-$HOME/Documents/Repos}
 IFS=: read -ra root_dirs <<< "$roots"
 
-selected=$(fd --type d --min-depth 1 --max-depth 1 . "${root_dirs[@]}" \
+selected=$(fd --type d --min-depth 1 --max-depth 1 --exclude '*-review-pr-*' . "${root_dirs[@]}" \
     | sed "s|^$HOME/|~/|; s|/$||" \
     | fzf --prompt 'session> ' --reverse --height 100%) || exit 0
 
