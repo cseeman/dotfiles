@@ -12,10 +12,11 @@ Concise technical explanations, Rails best practices focus
 - Collaborative, non-confrontational
 - Frame issues as questions or suggestions
 - Use "we" language, not "you should"
-- REQUEST_CHANGES only for genuine blockers
 
 ## PR Review Workflow
 Before posting any PR review or inline PR comment, use the `pr-review` skill (`~/.claude/skills/pr-review/SKILL.md`): payload skeletons, post-and-verify scripts, formatting rules, and gh failure-mode table.
+
+Review event: no blockers means APPROVE with inline comments; a blocker means COMMENT with inline comments. Do not use REQUEST_CHANGES.
 
 ## Review Comment Voice
 Applies to all code review, inline comments, and review agents (e.g. thoughtful-review).
