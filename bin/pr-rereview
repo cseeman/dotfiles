@@ -17,7 +17,8 @@ gh api graphql -f query="$query" -F me="$me" \
   -f q="is:open is:pr org:$org reviewed-by:$me -author:$me archived:false" \
 | jq -r --arg me "$me" '
   .data.search.nodes[]
-  | (.reviews.nodes) as $mine
+  | (.reviews.nodes | map(select(.state != "PENDING"))) as $mine
+  | select($mine | length > 0)
   | ([$mine[] | select(.state != "COMMENTED")] | last | .state // "") as $verdict
   | ([.reviewRequests.nodes[].requestedReviewer.login] | index($me) != null) as $asked
   | select($verdict != "APPROVED" or $asked)
