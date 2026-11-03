@@ -180,18 +180,27 @@ apply_claude() {
     done
 }
 
+# tmux run-shell has no terminal on stdout and tmux keeps OSC 4 per pane, so
+# inside tmux the greys go straight to each attached client's terminal.
+ansi_ttys() {
+    if [[ -n ${TMUX:-} ]]; then
+        tmux list-clients -F '#{client_tty}'
+    elif [[ -t 1 ]]; then
+        tty
+    fi
+}
+
 # shellcheck disable=SC1003  # the \\ is the OSC string terminator, not a quote
 apply_ansi() {
-    # Only meaningful when stdout is a terminal; from tmux run-shell these
-    # would otherwise be captured as literal text.
-    [[ -t 1 ]] || return 0
+    local seq target
     if [[ $1 == light ]]; then
-        printf '\033]4;7;rgb:%s\033\\' "$LIGHT_ANSI7"
-        printf '\033]4;8;rgb:%s\033\\' "$LIGHT_ANSI8"
+        seq=$(printf '\033]4;7;rgb:%s\033\\\033]4;8;rgb:%s\033\\' "$LIGHT_ANSI7" "$LIGHT_ANSI8")
     else
-        printf '\033]104;7\033\\'
-        printf '\033]104;8\033\\'
+        seq=$(printf '\033]104;7\033\\\033]104;8\033\\')
     fi
+    while read -r target; do
+        printf '%s' "$seq" > "$target" || warn "could not set greys on $target"
+    done < <(ansi_ttys)
 }
 
 cmd_list() {
@@ -277,7 +286,7 @@ Usage:
   $PROGRAM --help         show this message
 
 Options:
-  --no-starship           change the tmux theme only
+  --no-starship           leave the Starship palette alone
 
 Themes are declared in themes.registry. After adding one, run
 bin/gen-starship-palettes.sh to generate its Starship palette.
