@@ -17,8 +17,10 @@
 *.old
 *.backup
 old_*
-# Active theme pointer, set by switch-theme.sh
+# Active theme state, written by switch-theme.sh
 .config/tmux/config/theme.conf
+.config/starship.toml
+.config/glow/glow.yml
 
 # tmux plugins are installed by tpm; resurrect holds saved sessions
 .config/tmux/plugins/

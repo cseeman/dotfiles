@@ -7,13 +7,13 @@
 # Starship palette name are always the same string.
 #
 # tmux switches by repointing config/theme.conf at a theme file and sourcing
-# the config. Starship switches by rewriting its single `palette =` line, which
-# every shell picks up on its next prompt: Starship runs as a fresh process per
-# prompt and re-reads the config each time.
+# the config. Starship switches by regenerating its config from the tracked
+# starship.base.toml, which every shell picks up on its next prompt: Starship
+# runs as a fresh process per prompt and re-reads the config each time.
 #
 # The theme's mode (light or dark) is also written to ~/.config/theme-mode for
 # tools that only need to know that much: Neovim reads it for 'background', and
-# glow's style line is rewritten here directly. Alacritty follows through a
+# glow's config is regenerated from glow.base.yml. Alacritty follows through a
 # pointer file that imports one of the alacritty-theme files.
 
 set -euo pipefail
@@ -22,12 +22,15 @@ PROGRAM=${0##*/}
 readonly PROGRAM
 
 TMUX_DIR=${TMUX_DIR:-$HOME/.config/tmux}
-readonly TMUX_DIR
+REPO_CONFIG=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)
+readonly TMUX_DIR REPO_CONFIG
 readonly THEME_DIR="$TMUX_DIR/config"
 readonly REGISTRY="$TMUX_DIR/themes.registry"
 readonly ACTIVE_LINK="$THEME_DIR/theme.conf"
+readonly STARSHIP_BASE="${STARSHIP_BASE:-$REPO_CONFIG/starship.base.toml}"
 readonly STARSHIP_TOML="${STARSHIP_TOML:-$HOME/.config/starship.toml}"
 readonly MODE_FILE="${THEME_MODE_FILE:-$HOME/.config/theme-mode}"
+readonly GLOW_BASE="${GLOW_BASE:-$REPO_CONFIG/glow/glow.base.yml}"
 readonly GLOW_YML="${GLOW_YML:-$HOME/Library/Preferences/glow/glow.yml}"
 readonly ALACRITTY_THEMES="${ALACRITTY_THEMES:-$HOME/.config/alacritty/themes/themes}"
 readonly ALACRITTY_POINTER="${ALACRITTY_POINTER:-$HOME/.config/alacritty/theme.toml}"
@@ -122,17 +125,13 @@ apply_tmux() {
 
 apply_starship() {
     local name=$1
-    [[ -f $STARSHIP_TOML ]] || { warn "starship config not found; skipping"; return 0; }
-    if ! grep -q "^\[palettes\.$name\]" "$STARSHIP_TOML"; then
+    [[ -f $STARSHIP_BASE ]] || { warn "starship base config not found; skipping"; return 0; }
+    if ! grep -q "^\[palettes\.$name\]" "$STARSHIP_BASE"; then
         warn "no starship palette '$name'; run bin/gen-starship-palettes.sh"
         return 0
     fi
-    local tmp
-    tmp=$(mktemp)
-    sed "s/^palette *=.*/palette = '$name'/" "$STARSHIP_TOML" > "$tmp"
-    grep -q "^palette = '$name'$" "$tmp" || { rm -f "$tmp"; die "failed to set starship palette"; }
-    cat "$tmp" > "$STARSHIP_TOML"   # preserve the symlink rather than replacing it
-    rm -f "$tmp"
+    sed "s/^palette *=.*/palette = '$name'/" "$STARSHIP_BASE" > "$STARSHIP_TOML"
+    grep -q "^palette = '$name'$" "$STARSHIP_TOML" || die "failed to set starship palette"
 }
 
 apply_mode() {
@@ -141,12 +140,9 @@ apply_mode() {
 }
 
 apply_glow() {
-    local mode=$1 tmp
-    [[ -f $GLOW_YML ]] || return 0
-    tmp=$(mktemp)
-    sed "s/^style: .*/style: \"$mode\"/" "$GLOW_YML" > "$tmp"
-    cat "$tmp" > "$GLOW_YML"   # preserve the symlink rather than replacing it
-    rm -f "$tmp"
+    [[ -f $GLOW_BASE ]] || return 0
+    mkdir -p "$(dirname "$GLOW_YML")"
+    sed "s/^style: .*/style: \"$1\"/" "$GLOW_BASE" > "$GLOW_YML"
 }
 
 apply_alacritty() {

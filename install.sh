@@ -56,7 +56,7 @@ run()  { [[ $DRY_RUN == 1 ]] || "$@"; }
 
 link_one() {
     local src="$DOTFILES/$1" dst=$2
-    [[ -e $src ]] || { log "missing" "$src"; return 1; }
+    [[ -e $src || $DRY_RUN == 1 ]] || { log "missing" "$src"; return 1; }
 
     if [[ -L $dst && $(readlink "$dst") == "$src" ]]; then
         log "ok" "$dst"
@@ -71,6 +71,15 @@ link_one() {
     run mkdir -p "$(dirname "$dst")"
     run ln -s "$src" "$dst"
     log "link" "$dst -> $src"
+}
+
+# switch-theme.sh rewrites these, so only their .base files are tracked. A fresh
+# clone needs them to exist before the links below can point at them.
+seed_generated() {
+    [[ -e $DOTFILES/.config/starship.toml ]] \
+        || run cp "$DOTFILES/.config/starship.base.toml" "$DOTFILES/.config/starship.toml"
+    [[ -e $DOTFILES/.config/glow/glow.yml ]] \
+        || run cp "$DOTFILES/.config/glow/glow.base.yml" "$DOTFILES/.config/glow/glow.yml"
 }
 
 link_all() {
@@ -178,6 +187,7 @@ main() {
     done
 
     [[ $DRY_RUN == 0 ]] || printf 'Dry run: reporting what would change.\n\n'
+    seed_generated
     link_all
     [[ $WITH_BREW == 1 ]] && install_brew
     install_tmux_plugins
