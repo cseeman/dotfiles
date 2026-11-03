@@ -1,27 +1,18 @@
 #!/usr/bin/env bash
 #
-# Two-pane tmux session: shell on the left, Claude Code on the right.
+# One two-pane tmux session per worktree: shell on the left, Claude Code on the
+# right. Named after the directory, so the name stays true when the branch moves.
 # Usage: dev-session [session-name] [directory]
 
 set -euo pipefail
 
 die() { printf 'dev-session: %s\n' "$*" >&2; exit 1; }
-usage() { sed -n '3,4p' "$0" | sed 's/^# //'; }
+usage() { sed -n '3,5p' "$0" | sed 's/^# //'; }
 
 case ${1:-} in
     -h|--help) usage; exit 0 ;;
     -*)        usage >&2; die "unknown option: $1" ;;
 esac
-
-session_name() {
-    local project branch
-    project=$(basename "$PWD")
-    branch=$(git branch --show-current 2>/dev/null || true)
-    case $branch in
-        ""|main|master|develop) printf '%s' "$project" ;;
-        *)                      printf '%s-%s' "$project" "$branch" ;;
-    esac
-}
 
 # tmux rejects '.' and ':' in session names; '/' is flattened for readability.
 sanitize() { printf '%s' "$1" | tr '/:.' '---'; }
@@ -30,7 +21,7 @@ work_dir=${2:-$PWD}
 [[ -d $work_dir ]] || die "no such directory: $work_dir"
 cd "$work_dir"
 work_dir=$PWD
-session=$(sanitize "${1:-$(session_name)}")
+session=$(sanitize "${1:-$(basename "$PWD")}")
 
 notice=''
 attach() {
