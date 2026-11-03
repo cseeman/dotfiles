@@ -1,4 +1,6 @@
-# Everything the configs in this repo reference. Install with: brew bundle
+# What the configs and scripts in this repo need. Install with: brew bundle
+# Terminals are installed by hand: Homebrew disabled the Alacritty cask, and a
+# cask fails the whole bundle when its app is already in /Applications.
 
 # Shell
 brew "bash"
@@ -11,6 +13,9 @@ brew "bat"       # fzf previews and a paging cat
 brew "eza"       # ls with git status and tree
 brew "zoxide"    # cd that learns
 brew "mise"
+brew "jq"
+brew "shellcheck"  # make check
+brew "overmind"
 
 # Git
 brew "git"
