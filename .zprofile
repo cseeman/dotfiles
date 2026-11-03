@@ -6,3 +6,7 @@ export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
 export HOMEBREW_REPOSITORY="/opt/homebrew"
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export PATH="$HOME/rubyonmac:$HOME/bin:$HOME/.local/bin:$HOME/.local/share/mise/shims:$PATH"
+
+# Mirrors .bash_profile: signing needs the tty, and gh's keyring stays the source of truth.
+export GPG_TTY=$(tty 2>/dev/null)
+unset GITHUB_TOKEN
