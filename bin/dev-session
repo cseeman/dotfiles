@@ -5,6 +5,14 @@
 
 set -euo pipefail
 
+die() { printf 'dev-session: %s\n' "$*" >&2; exit 1; }
+usage() { sed -n '3,4p' "$0" | sed 's/^# //'; }
+
+case ${1:-} in
+    -h|--help) usage; exit 0 ;;
+    -*)        usage >&2; die "unknown option: $1" ;;
+esac
+
 session_name() {
     local project branch
     project=$(basename "$PWD")
@@ -19,7 +27,7 @@ session_name() {
 sanitize() { printf '%s' "$1" | tr '/:.' '---'; }
 
 work_dir=${2:-$PWD}
-[[ -d $work_dir ]] || { printf 'dev-session: no such directory: %s\n' "$work_dir" >&2; exit 1; }
+[[ -d $work_dir ]] || die "no such directory: $work_dir"
 cd "$work_dir"
 session=$(sanitize "${1:-$(session_name)}")
 
