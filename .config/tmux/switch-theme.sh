@@ -33,6 +33,7 @@ readonly ALACRITTY_THEMES="${ALACRITTY_THEMES:-$HOME/.config/alacritty/themes/th
 readonly ALACRITTY_POINTER="${ALACRITTY_POINTER:-$HOME/.config/alacritty/theme.toml}"
 readonly ALACRITTY_DARK_DEFAULT="carbonfox"
 readonly ALACRITTY_LIGHT_DEFAULT="dayfox"
+readonly CLAUDE_CONFIGS=("${CLAUDE_JSON:-$HOME/.claude.json}" "${CLAUDE_SETTINGS:-$HOME/.claude/settings.json}")
 
 # Muted greys for ANSI 7 and 8. Tools such as Claude Code use these for status
 # text; the terminal defaults are tuned for dark backgrounds and drop to ~2.3:1
@@ -159,6 +160,30 @@ apply_alacritty() {
     ln -sfn "$file" "$ALACRITTY_POINTER"
 }
 
+# Running Claude sessions rewrite these files too, so skip no-op writes, replace
+# by rename, and retry if one lands mid-update. Open sessions still need /theme.
+apply_claude() {
+    local theme="$1-ansi" file tmp before _
+    command -v jq >/dev/null || { warn "jq not found; skipping claude theme"; return 0; }
+    for file in "${CLAUDE_CONFIGS[@]}"; do
+        [[ -s $file ]] || continue
+        jq -e --arg t "$theme" '.theme == $t' "$file" >/dev/null 2>&1 && continue
+        tmp=$(mktemp "$file.XXXXXX")
+        for _ in 1 2 3; do
+            before=$(cksum < "$file")
+            jq --arg t "$theme" '.theme = $t' "$file" > "$tmp" || break
+            if [[ $before == "$(cksum < "$file")" ]]; then
+                mv "$tmp" "$file"
+                break
+            fi
+        done
+        if [[ -e $tmp ]]; then
+            rm -f "$tmp"
+            warn "could not update claude theme in $file"
+        fi
+    done
+}
+
 # shellcheck disable=SC1003  # the \\ is the OSC string terminator, not a quote
 apply_ansi() {
     # Only meaningful when stdout is a terminal; from tmux run-shell these
@@ -236,6 +261,7 @@ cmd_switch() {
     apply_mode "${THEME_MODES[$idx]}"
     apply_glow "${THEME_MODES[$idx]}"
     apply_alacritty "$idx" "${THEME_MODES[$idx]}"
+    apply_claude "${THEME_MODES[$idx]}"
     apply_ansi "${THEME_MODES[$idx]}"
 
     printf 'Switched to %s (%s)\n' "$name" "${THEME_MODES[$idx]}"
@@ -245,7 +271,7 @@ cmd_switch() {
 
 usage() {
     cat <<USAGE
-$PROGRAM - switch the tmux theme, Starship palette, Alacritty theme, and light/dark mode together
+$PROGRAM - switch the tmux theme, Starship palette, Alacritty and Claude Code themes, and light/dark mode together
 
 Usage:
   $PROGRAM <theme>        switch to a theme
