@@ -23,7 +23,7 @@
   lb     = log --graph --oneline --branches
   ll     = log --stat
   lll    = log -p
-  oops   = reset --hard HEAD~1
+  oops   = reset --keep HEAD~1
   up     = pull --rebase --autostash
   remotes = remote -v
   rhh = reset --hard HEAD
