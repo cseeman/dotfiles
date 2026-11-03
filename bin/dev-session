@@ -29,17 +29,23 @@ sanitize() { printf '%s' "$1" | tr '/:.' '---'; }
 work_dir=${2:-$PWD}
 [[ -d $work_dir ]] || die "no such directory: $work_dir"
 cd "$work_dir"
+work_dir=$PWD
 session=$(sanitize "${1:-$(session_name)}")
 
+notice=''
 attach() {
-    if [[ -n ${TMUX:-} ]]; then
-        exec tmux switch-client -t "=$session"
-    else
-        exec tmux attach-session -t "=$session"
+    local cmd=attach-session
+    [[ -z ${TMUX:-} ]] || cmd=switch-client
+    if [[ -n $notice ]]; then
+        printf 'dev-session: %s\n' "$notice" >&2
+        exec tmux "$cmd" -t "=$session" \; display-message -d 5000 "$notice"
     fi
+    exec tmux "$cmd" -t "=$session"
 }
 
 if tmux has-session -t "=$session" 2>/dev/null; then
+    existing=$(tmux display-message -p -t "=$session:" '#{session_path}')
+    [[ $existing == "$work_dir" ]] || notice="session $session is in $existing, not $work_dir"
     attach
 fi
 
