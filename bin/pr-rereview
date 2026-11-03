@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Lists open PRs I reviewed but have not approved, with what changed since my last review.
+set -euo pipefail
+# shellcheck source=/dev/null
+[[ -r ~/.pr-tools.local ]] && source ~/.pr-tools.local
+org="${1:-${PR_REREVIEW_ORG:-}}"
+[[ -n $org ]] || { echo "pr-rereview: pass an org or set PR_REREVIEW_ORG in ~/.pr-tools.local" >&2; exit 1; }
+me=$(gh api user --jq .login)
+query='query($q:String!,$me:String!){search(query:$q,type:ISSUE,first:50){nodes{...on PullRequest{
+  number title url isDraft headRefOid author{login} repository{name}
+  reviewRequests(first:20){nodes{requestedReviewer{...on User{login}}}}
+  reviews(last:30,author:$me){nodes{state submittedAt commit{oid}}}
+  commits(last:100){nodes{commit{oid committedDate parents{totalCount}}}}
+  reviewThreads(first:100){nodes{isResolved comments(first:50){nodes{author{login} createdAt}}}}
+}}}}'
+gh api graphql -f query="$query" -F me="$me" \
+  -f q="is:open is:pr org:$org reviewed-by:$me -author:$me archived:false" \
+| jq -r --arg me "$me" '
+  .data.search.nodes[]
+  | (.reviews.nodes) as $mine
+  | ([$mine[] | select(.state != "COMMENTED")] | last | .state // "") as $verdict
+  | select($verdict != "APPROVED")
+  | ($mine | last) as $last
+  | ([.commits.nodes[].commit]) as $commits
+  | ($commits | map(.oid) | index($last.commit.oid)) as $at
+  | (if $at == null then null else [$commits[($at + 1):][] | select(.parents.totalCount < 2)] | length end) as $new
+  | ([.reviewThreads.nodes[] | select(.isResolved | not)
+      | select(any(.comments.nodes[]; .author.login == $me))
+      | select(.comments.nodes | last | .author.login != $me)
+      | select((.comments.nodes | last | .createdAt) > $last.submittedAt)] | length) as $replies
+  | ([.reviewRequests.nodes[].requestedReviewer.login] | index($me) != null) as $asked
+  | (if .isDraft then "draft"
+     elif $asked then "1 re-requested"
+     elif $at == null then "2 force-pushed"
+     elif $new > 0 then "2 new commits (\($new))"
+     elif $replies > 0 then "3 replies (\($replies))"
+     else "4 waiting on author" end) as $status
+  | [$status, "\(.repository.name)#\(.number)", .author.login, ($last.submittedAt[0:10]), .url] | @tsv' \
+| sort | column -t -s $'\t'
