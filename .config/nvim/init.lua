@@ -46,6 +46,9 @@ Plug('junegunn/fzf.vim')
 -- Treesitter, main branch: parsers are compiled by the tree-sitter CLI
 Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
 
+-- Ctrl-h/j/k/l cross from Neovim splits into tmux panes; keybindings.conf is the other half.
+Plug('christoomey/vim-tmux-navigator')
+
 -- Gruvbox Theme - making it pretty
 Plug 'ellisonleao/gruvbox.nvim'
 
@@ -176,12 +179,6 @@ vim.keymap.set('n', '<leader>f', ':Rg<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>w', ':w<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>q', ':q<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>Q', ':qa!<CR>', { noremap = true, silent = true })
-
--- Better window navigation
-vim.keymap.set('n', '<C-h>', '<C-w>h', { noremap = true })
-vim.keymap.set('n', '<C-j>', '<C-w>j', { noremap = true })
-vim.keymap.set('n', '<C-k>', '<C-w>k', { noremap = true })
-vim.keymap.set('n', '<C-l>', '<C-w>l', { noremap = true })
 
 -- Clear search highlighting
 vim.keymap.set('n', '<leader><CR>', ':nohlsearch<CR>', { noremap = true, silent = true })
