@@ -35,7 +35,7 @@
   #Typical Spelling snafu
   checkou = checkout
   statsh = stash
-  cop = !git add -N . && git diff --name-only | xargs rubocop
+  cop = !git add -N . && git diff --name-only --diff-filter=d -- '*.rb' '*.rake' | xargs rubocop
 	conflicts = diff --name-only --diff-filter=U
 	wt-status = !pwd && git branch --show-current && git status --short
   wlist = !git worktree list --porcelain | grep -A 2 "$(pwd)"
