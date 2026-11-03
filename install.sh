@@ -52,7 +52,14 @@ USAGE
 }
 
 log()  { printf '  %-8s %s\n' "$1" "$2"; }
-run()  { [[ $DRY_RUN == 1 ]] || "$@"; }
+run()  {
+    if [[ $DRY_RUN == 1 ]]; then
+        log "would" "$*" >&2
+    else
+        "$@"
+    fi
+}
+ok()   { [[ $DRY_RUN == 1 ]] || log "ok" "$1"; }
 
 link_one() {
     local src="$DOTFILES/$1" dst=$2
@@ -68,7 +75,7 @@ link_one() {
         run mkdir -p "$(dirname "$keep")"
         run mv "$dst" "$keep"
     fi
-    run mkdir -p "$(dirname "$dst")"
+    [[ $DRY_RUN == 1 ]] || mkdir -p "$(dirname "$dst")"
     run ln -s "$src" "$dst"
     log "link" "$dst -> $src"
 }
@@ -110,7 +117,7 @@ install_tmux_plugins() {
     fi
     if command -v tmux >/dev/null 2>&1 && [[ -x $TPM_DIR/bin/install_plugins ]]; then
         run "$TPM_DIR/bin/install_plugins" >/dev/null
-        log "ok" "plugins installed"
+        ok "plugins installed"
     fi
 }
 
@@ -171,7 +178,7 @@ install_vim_plug() {
     fi
     if command -v nvim >/dev/null 2>&1; then
         run nvim --headless +PlugInstall +qa
-        log "ok" "plugins installed"
+        ok "plugins installed"
     fi
 }
 
