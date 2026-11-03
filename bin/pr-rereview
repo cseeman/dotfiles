@@ -6,6 +6,7 @@ set -euo pipefail
 org="${1:-${PR_REREVIEW_ORG:-}}"
 [[ -n $org ]] || { echo "pr-rereview: pass an org or set PR_REREVIEW_ORG in ~/.pr-tools.local" >&2; exit 1; }
 me=$(gh api user --jq .login)
+# shellcheck disable=SC2016  # $q and $me are GraphQL variables
 query='query($q:String!,$me:String!){search(query:$q,type:ISSUE,first:50){nodes{...on PullRequest{
   number title url isDraft headRefOid author{login} repository{name}
   reviewRequests(first:20){nodes{requestedReviewer{...on User{login}}}}
