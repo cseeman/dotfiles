@@ -22,5 +22,5 @@ waiting=$(printf '%s\n' "$output" | grep -E '^[123] ' || true)
 [ -z "$waiting" ] && exit 0
 
 count=$(printf '%s\n' "$waiting" | wc -l | tr -d ' ')
-names=$(printf '%s\n' "$waiting" | grep -oE '[a-z_]+#[0-9]+' | head -3 | paste -sd ',' - | sed 's/,/, /g')
+names=$(printf '%s\n' "$waiting" | grep -oE '[^[:space:]]+#[0-9]+' | head -3 | paste -sd ',' - | sed 's/,/, /g')
 notify "PR re-review: $count to check" "$names. Run pr-rereview for details."
