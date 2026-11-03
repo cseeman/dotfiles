@@ -43,7 +43,7 @@ Type `cheat` in any shell to open this.
 |---|---|
 | `git recent` | Branches by last commit, as many as fit the screen |
 | `git recent 5` | Just five |
-| `git wclean ../repo-feature` | Remove a worktree, delete its branch, prune |
+| `git wclean ../repo-feature` | Remove a clean worktree, delete its branch if merged |
 | `git pf` | `push --force-with-lease` |
 | `git can` | Amend without editing the message |
 | `git up` | `pull --rebase --autostash` |

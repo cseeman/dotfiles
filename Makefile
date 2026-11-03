@@ -1,4 +1,4 @@
-SHELL_SCRIPTS := install.sh bin/dev-session bin/git-recent bin/pr-rereview \
+SHELL_SCRIPTS := install.sh bin/dev-session bin/git-recent bin/git-wclean bin/pr-rereview \
 	bin/pr-rereview-notify bin/pr-surfaces bin/pr-waiting bin/tmux-sessionizer \
 	.config/tmux/switch-theme.sh .config/tmux/bin/gen-starship-palettes.sh \
 	alacritty/switch-font.sh

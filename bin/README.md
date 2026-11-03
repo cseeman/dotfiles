@@ -77,7 +77,7 @@ git worktree add ../project-feature-name branch-name
 cd ../project-feature-name
 dev-session                      # session named project-feature-name
 
-git wclean ../project-feature-name   # remove worktree, delete branch, prune
+git wclean ../project-feature-name   # remove worktree, delete its branch if merged
 ```
 
 ## pr-waiting

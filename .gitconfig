@@ -39,23 +39,6 @@
 	conflicts = diff --name-only --diff-filter=U
 	wt-status = !pwd && git branch --show-current && git status --short
   wlist = !git worktree list --porcelain | grep -A 2 "$(pwd)"
-  wclean = "!f() { \
-    if [ -z \"$1\" ]; then \
-      echo \"Usage: git wclean <worktree-name-or-path>\"; \
-      echo \"Example: git wclean my-feature-branch\"; \
-      echo \"Example: git wclean /path/to/worktree\"; \
-      return 1; \
-    fi; \
-    echo \"Removing worktree: $1\"; \
-    git worktree remove --force \"$1\" && \
-    if git show-ref --verify --quiet refs/heads/\"$(basename \"$1\")\"; then \
-      echo \"Deleting local branch: $(basename \"$1\")\"; \
-      git branch -d \"$(basename \"$1\")\"; \
-    fi; \
-    echo \"Pruning stale worktree references\"; \
-    git worktree prune; \
-    echo \"Worktree cleanup complete!\"; \
-  }; f"
   ps = push origin HEAD
 	recent-pager = !git branch --sort=-committerdate --format=\"%(committerdate:relative)%09%(refname:short)\" | less -FX
 	# git recent [n] is bin/git-recent; these keep the old names working
@@ -99,6 +82,6 @@
 [rerere]
 	enabled = true
 	autoUpdate = true
-# Machine-specific settings (github.user, work identity). Later wins.
+# Machine-specific settings (work identity, credential helpers). Later wins.
 [include]
 	path = ~/.gitconfig.local
