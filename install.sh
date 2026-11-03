@@ -16,6 +16,7 @@ readonly DEFAULT_THEME="equinox-dawn"
 readonly DEFAULT_FONT="maple"
 readonly FONT_POINTER="$HOME/.config/alacritty/font.toml"
 readonly ALACRITTY_THEMES="$HOME/.config/alacritty/themes"
+readonly LAUNCH_AGENT="com.christine.pr-rereview"
 
 DRY_RUN=0
 WITH_BREW=1
@@ -144,6 +145,23 @@ seed_local_overrides() {
     log "create" "$f (fill in github.user)"
 }
 
+# Copied, not linked: launchd does not reliably load symlinked agents.
+install_launch_agent() {
+    printf '\nLaunch agents\n'
+    local dst="$HOME/Library/LaunchAgents/$LAUNCH_AGENT.plist" rendered
+    rendered=$(sed "s|__HOME__|$HOME|g" "$DOTFILES/launchd/$LAUNCH_AGENT.plist")
+    if [[ -f $dst && $(cat "$dst") == "$rendered" ]]; then
+        log "ok" "$LAUNCH_AGENT"
+        return 0
+    fi
+    log "install" "$dst"
+    [[ $DRY_RUN == 0 ]] || return 0
+    mkdir -p "$(dirname "$dst")"
+    printf '%s\n' "$rendered" > "$dst"
+    launchctl bootout "gui/$(id -u)/$LAUNCH_AGENT" 2>/dev/null || true
+    launchctl bootstrap "gui/$(id -u)" "$dst"
+}
+
 install_vim_plug() {
     printf '\nNeovim\n'
     if [[ ! -f $PLUG_VIM ]]; then
@@ -179,6 +197,7 @@ main() {
     select_font
     seed_local_overrides
     install_vim_plug
+    install_launch_agent
 
     printf '\nDone. Open a new shell to pick up the changes.\n'
 }
