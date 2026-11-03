@@ -19,7 +19,8 @@ gh api graphql -f query="$query" -F me="$me" \
   .data.search.nodes[]
   | (.reviews.nodes) as $mine
   | ([$mine[] | select(.state != "COMMENTED")] | last | .state // "") as $verdict
-  | select($verdict != "APPROVED")
+  | ([.reviewRequests.nodes[].requestedReviewer.login] | index($me) != null) as $asked
+  | select($verdict != "APPROVED" or $asked)
   | ($mine | last) as $last
   | ([.commits.nodes[].commit]) as $commits
   | ($commits | map(.oid) | index($last.commit.oid)) as $at
@@ -28,7 +29,6 @@ gh api graphql -f query="$query" -F me="$me" \
       | select(any(.comments.nodes[]; .author.login == $me))
       | select(.comments.nodes | last | .author.login != $me)
       | select((.comments.nodes | last | .createdAt) > $last.submittedAt)] | length) as $replies
-  | ([.reviewRequests.nodes[].requestedReviewer.login] | index($me) != null) as $asked
   | (if .isDraft then "draft"
      elif $asked then "1 re-requested"
      elif $at == null then "2 force-pushed"
