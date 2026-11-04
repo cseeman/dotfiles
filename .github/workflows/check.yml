@@ -10,5 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y shellcheck tmux neovim
+      - run: sudo apt-get update && sudo apt-get install -y shellcheck tmux
+      - name: Install the Neovim version used locally
+        run: |
+          curl -fsSL https://github.com/neovim/neovim/releases/download/v0.12.6/nvim-linux-x86_64.tar.gz | sudo tar xz -C /opt
+          echo /opt/nvim-linux-x86_64/bin >> "$GITHUB_PATH"
+      - name: Install Neovim plugins
+        run: |
+          curl -fsSLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+          nvim --headless -u .config/nvim/init.lua +PlugInstall +qa
       - run: make check
