@@ -10,7 +10,8 @@ blocked=0
 scan_names() {
     local range=("$1" --not "--remotes=$remote") hits
     hits=$({
-        git log --format='%an <%ae>%n%B' "${range[@]}"
+        git log --format='%an <%ae>' "${range[@]}" | grep -v -F "<$(git config user.email)>"
+        git log --format=%B "${range[@]}"
         git log -p --no-color --format= "${range[@]}" | grep '^+'
     } | grep -i -E -f <(grep -v -E '^(#|$)' "$patterns"))
     [[ -z $hits ]] && return 0
