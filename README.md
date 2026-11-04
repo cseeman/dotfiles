@@ -86,7 +86,7 @@ The installer, in order:
 5. Sets the default tmux theme (equinox-dawn) and Alacritty font (Maple) if none is active.
 6. Fetches vim-plug and installs the Neovim plugins.
 7. Installs the launch agent behind `pr-rereview-notify`.
-8. Commits to this repo with the GitHub noreply address.
+8. Commits to this repo with the GitHub noreply address and turns on its pre-push check.
 
 Re-running is safe; links already in place are skipped.
 
@@ -97,6 +97,9 @@ present. Set `user.email` in `~/.gitconfig.local`. `~/.pr-tools.local` holds the
 
 Private GitHub gems need a classic PAT with only `read:packages`, stored once:
 `bundle config set --global rubygems.pkg.github.com <login>:<pat>`.
+
+`hooks/pre-push` blocks pushes containing secrets or anything matching the
+regexes in the untracked `~/.dotfiles-private-patterns`, one per line.
 
 `make check` lints the shell scripts, sources every tmux config into a scratch
 server, and starts Neovim headless. Run it before committing.

@@ -155,7 +155,8 @@ select_font() {
 configure_repo() {
     printf '\nThis repo\n'
     run git -C "$DOTFILES" config user.email "$PUBLIC_EMAIL"
-    ok "public commit email"
+    run git -C "$DOTFILES" config core.hooksPath hooks
+    ok "public commit email and push checks"
 }
 
 install_launch_agent() {

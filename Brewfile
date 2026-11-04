@@ -22,6 +22,7 @@ brew "git"
 brew "gh"
 brew "gnupg"
 brew "pinentry-mac"
+brew "gitleaks"  # hooks/pre-push
 
 # Terminal
 brew "tmux"

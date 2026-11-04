@@ -1,7 +1,7 @@
 SHELL_SCRIPTS := install.sh bin/dev-session bin/git-recent bin/git-wclean bin/pr-rereview \
 	bin/pr-rereview-notify bin/pr-surfaces bin/pr-waiting bin/tmux-sessionizer \
 	.config/tmux/switch-theme.sh .config/tmux/bin/gen-starship-palettes.sh \
-	alacritty/switch-font.sh
+	alacritty/switch-font.sh hooks/pre-push
 TMUX_CONFS := .config/tmux/config/options.conf .config/tmux/config/keybindings.conf \
 	$(wildcard .config/tmux/config/theme-*.conf)
 SOCKET := dotfiles-check-$(shell id -u)
