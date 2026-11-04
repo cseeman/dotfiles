@@ -17,6 +17,7 @@ readonly DEFAULT_FONT="maple"
 readonly FONT_POINTER="$HOME/.config/alacritty/font.toml"
 readonly ALACRITTY_THEMES="$HOME/.config/alacritty/themes"
 readonly LAUNCH_AGENT="com.christine.pr-rereview"
+readonly PUBLIC_EMAIL="39634128+cseeman@users.noreply.github.com"
 
 DRY_RUN=0
 WITH_BREW=1
@@ -151,6 +152,12 @@ select_font() {
 }
 
 # Copied, not linked: launchd does not reliably load symlinked agents.
+configure_repo() {
+    printf '\nThis repo\n'
+    run git -C "$DOTFILES" config user.email "$PUBLIC_EMAIL"
+    ok "public commit email"
+}
+
 install_launch_agent() {
     printf '\nLaunch agents\n'
     local dst="$HOME/Library/LaunchAgents/$LAUNCH_AGENT.plist" rendered
@@ -203,6 +210,7 @@ main() {
     select_font
     install_vim_plug
     install_launch_agent
+    configure_repo
 
     printf '\nDone. Open a new shell to pick up the changes.\n'
 }

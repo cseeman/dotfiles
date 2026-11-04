@@ -86,12 +86,13 @@ The installer, in order:
 5. Sets the default tmux theme (equinox-dawn) and Alacritty font (Maple) if none is active.
 6. Fetches vim-plug and installs the Neovim plugins.
 7. Installs the launch agent behind `pr-rereview-notify`.
+8. Commits to this repo with the GitHub noreply address.
 
 Re-running is safe; links already in place are skipped.
 
 Machine-specific settings stay out of the repo: `~/.bashrc.local`,
 `~/.zshrc.local`, and `~/.gitconfig.local` are sourced or included when
-present. `~/.pr-tools.local` holds the repos the PR scripts query, see
+present. Set `user.email` in `~/.gitconfig.local`. `~/.pr-tools.local` holds the repos the PR scripts query, see
 `bin/README.md`.
 
 Private GitHub gems need a classic PAT with only `read:packages`, stored once:
