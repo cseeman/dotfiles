@@ -86,7 +86,7 @@ The installer, in order:
 5. Sets the default tmux theme (equinox-dawn) and Alacritty font (Maple) if none is active.
 6. Fetches vim-plug and installs the Neovim plugins.
 7. Installs the launch agent behind `pr-rereview-notify`.
-8. Commits to this repo with the GitHub noreply address and turns on its pre-push check.
+8. Turns on this repo's pre-push check.
 
 Re-running is safe; links already in place are skipped.
 
