@@ -43,12 +43,13 @@ style, and Neovim's background to match. Details in `.config/tmux/THEMES.md`.
 - `alacritty/fonts/` - One file per font; `switch-font.sh <name>` picks one
 
 ### AI Workflow
-- `bin/dev-session` - Sets up a 2-pane tmux layout: shell + Claude (docs in `bin/README.md`)
-- `bin/git-recent*` - Recently active branches, sized to the terminal
+- `bin/dev-session` - One 2-pane tmux session per worktree: shell + Claude (docs in `bin/README.md`)
+- `bin/git-recent` - Recently active branches, sized to the terminal
 - `.claude/` - Claude Code preferences (code style, git workflow, PR conventions)
 
 ### Git
-- `.gitconfig` - Aliases (`git pf`, `git can`, `git up`), worktree helpers (`git wclean`, `git wlist`), GPG signing
+- `.gitconfig` - Aliases (`git pf`, `git can`, `git up`), `git wlist`, GPG signing
+- `bin/git-wclean` - Removes a clean worktree and its merged branch
 - Stacked-branch defaults: `rebase.updateRefs`, `autoSquash`, `autoStash`, `rerere`, `push.autoSetupRemote`
 
 `CHEATSHEET.md` lists the keys and commands worth remembering; `cheat` opens it
@@ -84,13 +85,17 @@ The installer, in order:
 4. Clones the alacritty-theme collection.
 5. Sets the default tmux theme (equinox-dawn) and Alacritty font (Maple) if none is active.
 6. Fetches vim-plug and installs the Neovim plugins.
+7. Installs the launch agent behind `pr-rereview-notify`.
 
 Re-running is safe; links already in place are skipped.
 
 Machine-specific settings stay out of the repo: `~/.bashrc.local`,
 `~/.zshrc.local`, and `~/.gitconfig.local` are sourced or included when
-present. The installer seeds `~/.gitconfig.local` with a `github.user` line,
-which `.bashrc` uses to hand Bundler a GitHub Packages credential.
+present. `~/.pr-tools.local` holds the repos the PR scripts query, see
+`bin/README.md`.
+
+Private GitHub gems need a classic PAT with only `read:packages`, stored once:
+`bundle config set --global rubygems.pkg.github.com <login>:<pat>`.
 
 `make check` lints the shell scripts, sources every tmux config into a scratch
 server, and starts Neovim headless. Run it before committing.

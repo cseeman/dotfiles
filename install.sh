@@ -16,6 +16,7 @@ readonly DEFAULT_THEME="equinox-dawn"
 readonly DEFAULT_FONT="maple"
 readonly FONT_POINTER="$HOME/.config/alacritty/font.toml"
 readonly ALACRITTY_THEMES="$HOME/.config/alacritty/themes"
+readonly LAUNCH_AGENT="com.christine.pr-rereview"
 
 DRY_RUN=0
 WITH_BREW=1
@@ -51,11 +52,18 @@ USAGE
 }
 
 log()  { printf '  %-8s %s\n' "$1" "$2"; }
-run()  { [[ $DRY_RUN == 1 ]] || "$@"; }
+run()  {
+    if [[ $DRY_RUN == 1 ]]; then
+        log "would" "$*" >&2
+    else
+        "$@"
+    fi
+}
+ok()   { [[ $DRY_RUN == 1 ]] || log "ok" "$1"; }
 
 link_one() {
     local src="$DOTFILES/$1" dst=$2
-    [[ -e $src ]] || { log "missing" "$src"; return 1; }
+    [[ -e $src || $DRY_RUN == 1 ]] || { log "missing" "$src"; return 1; }
 
     if [[ -L $dst && $(readlink "$dst") == "$src" ]]; then
         log "ok" "$dst"
@@ -67,9 +75,18 @@ link_one() {
         run mkdir -p "$(dirname "$keep")"
         run mv "$dst" "$keep"
     fi
-    run mkdir -p "$(dirname "$dst")"
+    [[ $DRY_RUN == 1 ]] || mkdir -p "$(dirname "$dst")"
     run ln -s "$src" "$dst"
     log "link" "$dst -> $src"
+}
+
+# switch-theme.sh rewrites these, so only their .base files are tracked. A fresh
+# clone needs them to exist before the links below can point at them.
+seed_generated() {
+    [[ -e $DOTFILES/.config/starship.toml ]] \
+        || run cp "$DOTFILES/.config/starship.base.toml" "$DOTFILES/.config/starship.toml"
+    [[ -e $DOTFILES/.config/glow/glow.yml ]] \
+        || run cp "$DOTFILES/.config/glow/glow.base.yml" "$DOTFILES/.config/glow/glow.yml"
 }
 
 link_all() {
@@ -100,7 +117,7 @@ install_tmux_plugins() {
     fi
     if command -v tmux >/dev/null 2>&1 && [[ -x $TPM_DIR/bin/install_plugins ]]; then
         run "$TPM_DIR/bin/install_plugins" >/dev/null
-        log "ok" "plugins installed"
+        ok "plugins installed"
     fi
 }
 
@@ -133,15 +150,21 @@ select_font() {
     run "$DOTFILES/alacritty/switch-font.sh" "$DEFAULT_FONT"
 }
 
-seed_local_overrides() {
-    printf '\nLocal overrides\n'
-    local f="$HOME/.gitconfig.local"
-    if [[ -e $f ]]; then
-        log "ok" "$f"
+# Copied, not linked: launchd does not reliably load symlinked agents.
+install_launch_agent() {
+    printf '\nLaunch agents\n'
+    local dst="$HOME/Library/LaunchAgents/$LAUNCH_AGENT.plist" rendered
+    rendered=$(sed "s|__HOME__|$HOME|g" "$DOTFILES/launchd/$LAUNCH_AGENT.plist")
+    if [[ -f $dst && $(cat "$dst") == "$rendered" ]]; then
+        log "ok" "$LAUNCH_AGENT"
         return 0
     fi
-    run sh -c "printf '[github]\n\t# user = your-github-login\n' > '$f'"
-    log "create" "$f (fill in github.user)"
+    log "install" "$dst"
+    [[ $DRY_RUN == 0 ]] || return 0
+    mkdir -p "$(dirname "$dst")"
+    printf '%s\n' "$rendered" > "$dst"
+    launchctl bootout "gui/$(id -u)/$LAUNCH_AGENT" 2>/dev/null || true
+    launchctl bootstrap "gui/$(id -u)" "$dst"
 }
 
 install_vim_plug() {
@@ -155,7 +178,7 @@ install_vim_plug() {
     fi
     if command -v nvim >/dev/null 2>&1; then
         run nvim --headless +PlugInstall +qa
-        log "ok" "plugins installed"
+        ok "plugins installed"
     fi
 }
 
@@ -171,14 +194,15 @@ main() {
     done
 
     [[ $DRY_RUN == 0 ]] || printf 'Dry run: reporting what would change.\n\n'
+    seed_generated
     link_all
     [[ $WITH_BREW == 1 ]] && install_brew
     install_tmux_plugins
     install_alacritty_themes
     select_theme
     select_font
-    seed_local_overrides
     install_vim_plug
+    install_launch_agent
 
     printf '\nDone. Open a new shell to pick up the changes.\n'
 }

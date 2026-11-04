@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Runs pr-rereview, keeps the report, and notifies only when a PR needs attention.
+set -uo pipefail
+report="$HOME/Library/Logs/pr-rereview-latest.txt"
+
+notify() {
+  osascript - "$1" "$2" <<'APPLESCRIPT'
+on run argv
+  display notification (item 2 of argv) with title (item 1 of argv)
+end run
+APPLESCRIPT
+}
+
+if ! output=$("$HOME/bin/pr-rereview" 2>&1); then
+  printf '%s\n' "$output" > "$report"
+  notify "PR re-review check failed" "See $report"
+  exit 1
+fi
+
+printf '%s\n%s\n' "Checked $(date '+%a %b %d %H:%M %Z')" "$output" > "$report"
+waiting=$(printf '%s\n' "$output" | grep -E '^[123] ' || true)
+[ -z "$waiting" ] && exit 0
+
+count=$(printf '%s\n' "$waiting" | wc -l | tr -d ' ')
+names=$(printf '%s\n' "$waiting" | grep -oE '[^[:space:]]+#[0-9]+' | head -3 | paste -sd ',' - | sed 's/,/, /g')
+notify "PR re-review: $count to check" "$names. Run pr-rereview for details."

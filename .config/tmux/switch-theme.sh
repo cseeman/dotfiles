@@ -7,13 +7,13 @@
 # Starship palette name are always the same string.
 #
 # tmux switches by repointing config/theme.conf at a theme file and sourcing
-# the config. Starship switches by rewriting its single `palette =` line, which
-# every shell picks up on its next prompt: Starship runs as a fresh process per
-# prompt and re-reads the config each time.
+# the config. Starship switches by regenerating its config from the tracked
+# starship.base.toml, which every shell picks up on its next prompt: Starship
+# runs as a fresh process per prompt and re-reads the config each time.
 #
 # The theme's mode (light or dark) is also written to ~/.config/theme-mode for
 # tools that only need to know that much: Neovim reads it for 'background', and
-# glow's style line is rewritten here directly. Alacritty follows through a
+# glow's config is regenerated from glow.base.yml. Alacritty follows through a
 # pointer file that imports one of the alacritty-theme files.
 
 set -euo pipefail
@@ -22,17 +22,21 @@ PROGRAM=${0##*/}
 readonly PROGRAM
 
 TMUX_DIR=${TMUX_DIR:-$HOME/.config/tmux}
-readonly TMUX_DIR
+REPO_CONFIG=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)
+readonly TMUX_DIR REPO_CONFIG
 readonly THEME_DIR="$TMUX_DIR/config"
 readonly REGISTRY="$TMUX_DIR/themes.registry"
 readonly ACTIVE_LINK="$THEME_DIR/theme.conf"
+readonly STARSHIP_BASE="${STARSHIP_BASE:-$REPO_CONFIG/starship.base.toml}"
 readonly STARSHIP_TOML="${STARSHIP_TOML:-$HOME/.config/starship.toml}"
 readonly MODE_FILE="${THEME_MODE_FILE:-$HOME/.config/theme-mode}"
+readonly GLOW_BASE="${GLOW_BASE:-$REPO_CONFIG/glow/glow.base.yml}"
 readonly GLOW_YML="${GLOW_YML:-$HOME/Library/Preferences/glow/glow.yml}"
 readonly ALACRITTY_THEMES="${ALACRITTY_THEMES:-$HOME/.config/alacritty/themes/themes}"
 readonly ALACRITTY_POINTER="${ALACRITTY_POINTER:-$HOME/.config/alacritty/theme.toml}"
 readonly ALACRITTY_DARK_DEFAULT="carbonfox"
 readonly ALACRITTY_LIGHT_DEFAULT="dayfox"
+readonly CLAUDE_CONFIGS=("${CLAUDE_JSON:-$HOME/.claude.json}" "${CLAUDE_SETTINGS:-$HOME/.claude/settings.json}")
 
 # Muted greys for ANSI 7 and 8. Tools such as Claude Code use these for status
 # text; the terminal defaults are tuned for dark backgrounds and drop to ~2.3:1
@@ -121,17 +125,13 @@ apply_tmux() {
 
 apply_starship() {
     local name=$1
-    [[ -f $STARSHIP_TOML ]] || { warn "starship config not found; skipping"; return 0; }
-    if ! grep -q "^\[palettes\.$name\]" "$STARSHIP_TOML"; then
+    [[ -f $STARSHIP_BASE ]] || { warn "starship base config not found; skipping"; return 0; }
+    if ! grep -q "^\[palettes\.$name\]" "$STARSHIP_BASE"; then
         warn "no starship palette '$name'; run bin/gen-starship-palettes.sh"
         return 0
     fi
-    local tmp
-    tmp=$(mktemp)
-    sed "s/^palette *=.*/palette = '$name'/" "$STARSHIP_TOML" > "$tmp"
-    grep -q "^palette = '$name'$" "$tmp" || { rm -f "$tmp"; die "failed to set starship palette"; }
-    cat "$tmp" > "$STARSHIP_TOML"   # preserve the symlink rather than replacing it
-    rm -f "$tmp"
+    sed "s/^palette *=.*/palette = '$name'/" "$STARSHIP_BASE" > "$STARSHIP_TOML"
+    grep -q "^palette = '$name'$" "$STARSHIP_TOML" || die "failed to set starship palette"
 }
 
 apply_mode() {
@@ -140,12 +140,9 @@ apply_mode() {
 }
 
 apply_glow() {
-    local mode=$1 tmp
-    [[ -f $GLOW_YML ]] || return 0
-    tmp=$(mktemp)
-    sed "s/^style: .*/style: \"$mode\"/" "$GLOW_YML" > "$tmp"
-    cat "$tmp" > "$GLOW_YML"   # preserve the symlink rather than replacing it
-    rm -f "$tmp"
+    [[ -f $GLOW_BASE ]] || return 0
+    mkdir -p "$(dirname "$GLOW_YML")"
+    sed "s/^style: .*/style: \"$1\"/" "$GLOW_BASE" > "$GLOW_YML"
 }
 
 apply_alacritty() {
@@ -159,18 +156,51 @@ apply_alacritty() {
     ln -sfn "$file" "$ALACRITTY_POINTER"
 }
 
+# Running Claude sessions rewrite these files too, so skip no-op writes, replace
+# by rename, and retry if one lands mid-update. Open sessions still need /theme.
+apply_claude() {
+    local theme="$1-ansi" file tmp before _
+    command -v jq >/dev/null || { warn "jq not found; skipping claude theme"; return 0; }
+    for file in "${CLAUDE_CONFIGS[@]}"; do
+        [[ -s $file ]] || continue
+        jq -e --arg t "$theme" '.theme == $t' "$file" >/dev/null 2>&1 && continue
+        tmp=$(mktemp "$file.XXXXXX")
+        for _ in 1 2 3; do
+            before=$(cksum < "$file")
+            jq --arg t "$theme" '.theme = $t' "$file" > "$tmp" || break
+            if [[ $before == "$(cksum < "$file")" ]]; then
+                mv "$tmp" "$file"
+                break
+            fi
+        done
+        if [[ -e $tmp ]]; then
+            rm -f "$tmp"
+            warn "could not update claude theme in $file"
+        fi
+    done
+}
+
+# tmux run-shell has no terminal on stdout and tmux keeps OSC 4 per pane, so
+# inside tmux the greys go straight to each attached client's terminal.
+ansi_ttys() {
+    if [[ -n ${TMUX:-} ]]; then
+        tmux list-clients -F '#{client_tty}'
+    elif [[ -t 1 ]]; then
+        tty
+    fi
+}
+
 # shellcheck disable=SC1003  # the \\ is the OSC string terminator, not a quote
 apply_ansi() {
-    # Only meaningful when stdout is a terminal; from tmux run-shell these
-    # would otherwise be captured as literal text.
-    [[ -t 1 ]] || return 0
+    local seq target
     if [[ $1 == light ]]; then
-        printf '\033]4;7;rgb:%s\033\\' "$LIGHT_ANSI7"
-        printf '\033]4;8;rgb:%s\033\\' "$LIGHT_ANSI8"
+        seq=$(printf '\033]4;7;rgb:%s\033\\\033]4;8;rgb:%s\033\\' "$LIGHT_ANSI7" "$LIGHT_ANSI8")
     else
-        printf '\033]104;7\033\\'
-        printf '\033]104;8\033\\'
+        seq=$(printf '\033]104;7\033\\\033]104;8\033\\')
     fi
+    while read -r target; do
+        printf '%s' "$seq" > "$target" || warn "could not set greys on $target"
+    done < <(ansi_ttys)
 }
 
 cmd_list() {
@@ -236,6 +266,7 @@ cmd_switch() {
     apply_mode "${THEME_MODES[$idx]}"
     apply_glow "${THEME_MODES[$idx]}"
     apply_alacritty "$idx" "${THEME_MODES[$idx]}"
+    apply_claude "${THEME_MODES[$idx]}"
     apply_ansi "${THEME_MODES[$idx]}"
 
     printf 'Switched to %s (%s)\n' "$name" "${THEME_MODES[$idx]}"
@@ -245,7 +276,7 @@ cmd_switch() {
 
 usage() {
     cat <<USAGE
-$PROGRAM - switch the tmux theme, Starship palette, Alacritty theme, and light/dark mode together
+$PROGRAM - switch the tmux theme, Starship palette, Alacritty and Claude Code themes, and light/dark mode together
 
 Usage:
   $PROGRAM <theme>        switch to a theme
@@ -255,7 +286,7 @@ Usage:
   $PROGRAM --help         show this message
 
 Options:
-  --no-starship           change the tmux theme only
+  --no-starship           leave the Starship palette alone
 
 Themes are declared in themes.registry. After adding one, run
 bin/gen-starship-palettes.sh to generate its Starship palette.

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+#
+# Remove a linked worktree, then its branch if that branch is merged.
+# Usage: git wclean <worktree-path-or-directory-name>
+#
+# A dirty worktree or unmerged branch is left alone.
+
+set -euo pipefail
+
+die() { printf 'git wclean: %s\n' "$*" >&2; exit 1; }
+
+[[ $# -eq 1 ]] || { sed -n '4p' "$0" | sed 's/^# //' >&2; exit 1; }
+target=$1
+[[ -d $target ]] && target=$(cd "$target" && pwd -P)
+
+main='' path='' branch='' found='' found_branch=''
+while read -r key value; do
+    case $key in
+        worktree) path=$value; branch=''; [[ -n $main ]] || main=$value ;;
+        branch)   branch=${value#refs/heads/} ;;
+        '')
+            if [[ $path == "$target" || ${path##*/} == "$target" ]]; then
+                found=$path
+                found_branch=$branch
+            fi
+            ;;
+    esac
+done < <(git worktree list --porcelain)
+
+[[ -n $found ]] || die "no worktree matches $1"
+[[ $found != "$main" ]] || die "$found is the main checkout"
+
+git -C "$main" worktree remove "$found" \
+    || die "kept $found; commit or stash its changes first, or use: git worktree remove --force"
+printf 'Removed worktree %s\n' "$found"
+
+if [[ -n $found_branch ]]; then
+    git -C "$main" branch -d "$found_branch" \
+        || printf 'Kept branch %s; it is not merged. To drop it: git branch -D %s\n' "$found_branch" "$found_branch" >&2
+fi
+git -C "$main" worktree prune

@@ -32,7 +32,7 @@ Type `cheat` in any shell to open this.
 | `prefix t` | Toggle the status bar |
 | `prefix z` | Zoom the current pane |
 | `prefix \|` / `prefix -` | Split side by side / top and bottom |
-| `Ctrl-h/j/k/l` | Move between panes, and between Neovim splits |
+| `Ctrl-h/j/k/l` | Move between panes and Neovim splits (`Ctrl-j` stays with Claude) |
 | `prefix [` then `v`, `y` | Copy mode: select, yank to the clipboard |
 | `prefix r` | Reload tmux config |
 | `prefix R` / `prefix S` | Restore / save sessions (resurrect) |
@@ -43,7 +43,7 @@ Type `cheat` in any shell to open this.
 |---|---|
 | `git recent` | Branches by last commit, as many as fit the screen |
 | `git recent 5` | Just five |
-| `git wclean ../repo-feature` | Remove a worktree, delete its branch, prune |
+| `git wclean ../repo-feature` | Remove a clean worktree, delete its branch if merged |
 | `git pf` | `push --force-with-lease` |
 | `git can` | Amend without editing the message |
 | `git up` | `pull --rebase --autostash` |
@@ -58,6 +58,7 @@ Rebasing a stack updates every branch above it (`rebase.updateRefs`), and
 |---|---|
 | `pr-waiting` | Open PRs across your configured repos still waiting on you, oldest first |
 | `pr-waiting --all` | The same list unfiltered, the raw team queue |
+| `pr-rereview` | PRs you reviewed that may need another look |
 | `pr-surfaces` | Authored vs reviewed by month, and how much touched a decision surface |
 | `pr-surfaces --months 12` | A longer window |
 
@@ -91,6 +92,7 @@ ruby-lsp starts the first time you open a `.rb` in a project with a
 | Command | What |
 |---|---|
 | `dev` or `dev-session` | Two-pane tmux session for the current directory: shell left, Claude right |
+| `dev -w <branch>` | The same, in that branch's own worktree (created if needed) |
 | `switch-theme.sh --list` | Themes; `switch-theme.sh equinox-dawn` to switch everything |
 | `switch-font.sh` | Alacritty fonts; `switch-font.sh maple` to switch |
 | `make check` | Lint scripts, source tmux configs, start Neovim headless |

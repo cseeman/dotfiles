@@ -28,10 +28,7 @@ vim.opt.updatetime = 300               -- Faster completion
 vim.opt.timeoutlen = 300               -- Faster key sequence completion
 
 vim.call('plug#begin')
--- Shorthand notation for GitHub; translates to https://github.com/junegunn/seoul256.vim.git
--- Plug('junegunn/seoul256.vim')
 Plug('nvim-tree/nvim-web-devicons')
--- Any valid git URL is allowed
 Plug('https://github.com/junegunn/vim-easy-align.git')
 
 -- Adding Rails specific VIM plugins
@@ -46,20 +43,14 @@ Plug('junegunn/fzf.vim')
 -- Treesitter, main branch: parsers are compiled by the tree-sitter CLI
 Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
 
+-- Ctrl-h/j/k/l cross from Neovim splits into tmux panes; keybindings.conf is the other half.
+Plug('christoomey/vim-tmux-navigator')
+
 -- Gruvbox Theme - making it pretty
 Plug 'ellisonleao/gruvbox.nvim'
 
 -- Adding a colorize type plugin, to see if I can see the color of hexcodes by the codes
 Plug('rrethy/vim-hexokinase', { ['do'] = 'make hexokinase' })
-
--- If the vim plugin is in a subdirectory, use 'rtp' option to specify its path
--- Plug('nsf/gocode', { ['rtp'] = 'vim' })
-
--- On-demand loading: loaded when the specified command is executed
--- Plug('preservim/nerdtree', { ['on'] = 'NERDTreeToggle' })
-
--- On-demand loading: loaded when a file with a specific file type is opened
--- Plug('tpope/vim-fireplace', { ['for'] = 'clojure' })
 
 vim.call('plug#end')
 
@@ -176,12 +167,6 @@ vim.keymap.set('n', '<leader>f', ':Rg<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>w', ':w<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>q', ':q<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>Q', ':qa!<CR>', { noremap = true, silent = true })
-
--- Better window navigation
-vim.keymap.set('n', '<C-h>', '<C-w>h', { noremap = true })
-vim.keymap.set('n', '<C-j>', '<C-w>j', { noremap = true })
-vim.keymap.set('n', '<C-k>', '<C-w>k', { noremap = true })
-vim.keymap.set('n', '<C-l>', '<C-w>l', { noremap = true })
 
 -- Clear search highlighting
 vim.keymap.set('n', '<leader><CR>', ':nohlsearch<CR>', { noremap = true, silent = true })

@@ -19,9 +19,9 @@ theme, and the light/dark mode that glow and Neovim follow.
 | `bin/gen-starship-palettes.sh` | Generates Starship palettes from the tmux themes. |
 | `config/theme-*.conf` | One tmux theme each. Colors only. |
 | `config/theme.conf` | Symlink to the active theme. Not edited by hand. |
-| `../starship.toml` | Prompt config; holds every palette, one `palette =` line selects. |
+| `../starship.base.toml` | Prompt config; holds every palette. Generates the ignored `starship.toml`. |
 | `~/.config/theme-mode` | `light` or `dark`. Written on every switch, read by Neovim at startup. |
-| `../glow/glow.yml` | Its `style:` line is rewritten to the mode on every switch. |
+| `../glow/glow.base.yml` | Generates the ignored `glow.yml`, with `style:` set to the mode. |
 | `~/.config/alacritty/theme.toml` | Symlink into the alacritty-theme checkout, repointed on every switch. |
 
 tmux switches by repointing `config/theme.conf` and sourcing the config.
@@ -46,7 +46,7 @@ The generator sources each theme into a throwaway tmux server and reads the
 (`mauve`, `iris`, `plum` all mean roughly the same thing). It maps tmux roles
 onto prompt roles, so any theme works without a per-theme mapping table.
 
-Palettes live between marker comments in `starship.toml` and are overwritten on
+Palettes live between marker comments in `starship.base.toml` and are overwritten on
 each run. To change a prompt color, change the tmux theme and regenerate; edits
 inside the generated block do not survive.
 

@@ -1,37 +1,72 @@
 #!/usr/bin/env bash
 #
-# Two-pane tmux session: shell on the left, Claude Code on the right.
+# One two-pane tmux session per worktree: shell on the left, Claude Code on the
+# right. Named after the directory, so the name stays true when the branch moves.
 # Usage: dev-session [session-name] [directory]
+#        dev-session -w <branch> [session-name]   open the branch's own worktree
 
 set -euo pipefail
 
-session_name() {
-    local project branch
-    project=$(basename "$PWD")
-    branch=$(git branch --show-current 2>/dev/null || true)
-    case $branch in
-        ""|main|master|develop) printf '%s' "$project" ;;
-        *)                      printf '%s-%s' "$project" "$branch" ;;
-    esac
+die() { printf 'dev-session: %s\n' "$*" >&2; exit 1; }
+usage() { sed -n '3,6p' "$0" | sed 's/^# //'; }
+
+# The branch's existing worktree, or a new one beside the main checkout.
+worktree_for() {
+    local branch=$1 common main path='' key value
+    common=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) \
+        || die "-w needs a git repository"
+    main=$(dirname "$common")
+    while read -r key value; do
+        case $key in
+            worktree) path=$value ;;
+            branch)   [[ $value != "refs/heads/$branch" ]] || { printf '%s' "$path"; return 0; } ;;
+        esac
+    done < <(git worktree list --porcelain)
+
+    path="$(dirname "$main")/$(basename "$main")-${branch//\//-}"
+    if git show-ref --verify --quiet "refs/heads/$branch"; then
+        git worktree add --quiet "$path" "$branch" >&2 || die "could not create $path"
+    else
+        git worktree add --quiet -b "$branch" "$path" >&2 || die "could not create $path"
+    fi
+    printf '%s' "$path"
 }
+
+branch=''
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help) usage; exit 0 ;;
+        -w)        [[ $# -ge 2 ]] || die "-w needs a branch"; branch=$2; shift 2 ;;
+        -*)        usage >&2; die "unknown option: $1" ;;
+        *)         break ;;
+    esac
+done
+[[ -z $branch || $# -lt 2 ]] || die "-w and a directory cannot be combined"
 
 # tmux rejects '.' and ':' in session names; '/' is flattened for readability.
 sanitize() { printf '%s' "$1" | tr '/:.' '---'; }
 
 work_dir=${2:-$PWD}
-[[ -d $work_dir ]] || { printf 'dev-session: no such directory: %s\n' "$work_dir" >&2; exit 1; }
+[[ -z $branch ]] || work_dir=$(worktree_for "$branch")
+[[ -d $work_dir ]] || die "no such directory: $work_dir"
 cd "$work_dir"
-session=$(sanitize "${1:-$(session_name)}")
+work_dir=$PWD
+session=$(sanitize "${1:-$(basename "$PWD")}")
 
+notice=''
 attach() {
-    if [[ -n ${TMUX:-} ]]; then
-        exec tmux switch-client -t "=$session"
-    else
-        exec tmux attach-session -t "=$session"
+    local cmd=attach-session
+    [[ -z ${TMUX:-} ]] || cmd=switch-client
+    if [[ -n $notice ]]; then
+        printf 'dev-session: %s\n' "$notice" >&2
+        exec tmux "$cmd" -t "=$session" \; display-message -d 5000 "$notice"
     fi
+    exec tmux "$cmd" -t "=$session"
 }
 
 if tmux has-session -t "=$session" 2>/dev/null; then
+    existing=$(tmux display-message -p -t "=$session:" '#{session_path}')
+    [[ $existing == "$work_dir" ]] || notice="session $session is in $existing, not $work_dir"
     attach
 fi
 
