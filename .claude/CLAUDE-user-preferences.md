@@ -9,6 +9,7 @@
 - One fact per comment. Cut the sentence that re-explains the previous one. No narrating rejected alternatives, no reassurance, no "note that".
 
 ## Git Workflow
+- Branch names never carry a personal prefix (no `chris/`, no `christine/`). Use the ticket branch name (`<team>-NNNN-slug`) or, without a ticket, `feature/`, `fix/`, or `refactor/` plus a short slug. Never infer a naming convention from other developers' branches in the repo.
 - Atomic commits: one logical change each. If the subject needs "and", split the commit.
 - Amend small fixes into their parent commit; do not pile on "fix typo" commits.
 - Build small, incremental PRs that stack. One concern per PR.

@@ -271,7 +271,9 @@ cmd_switch() {
 
     printf 'Switched to %s (%s)\n' "$name" "${THEME_MODES[$idx]}"
     [[ $SKIP_STARSHIP == 1 ]] || printf 'Starship palette applies at the next prompt.\n'
-    [[ -n ${TMUX:-} ]] && tmux display-message "theme: $name" || true
+    if [[ -n ${TMUX:-} ]]; then
+        tmux display-message "theme: $name" || true
+    fi
 }
 
 usage() {

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# This repo is public, so block anything that would publish private names or secrets.
+# Names live in the untracked ~/.dotfiles-private-patterns, one case-insensitive regex per line.
+set -uo pipefail
+
+remote=$1
+patterns=${DOTFILES_PRIVATE_PATTERNS:-$HOME/.dotfiles-private-patterns}
+blocked=0
+
+scan_names() {
+    local range=("$1" --not "--remotes=$remote") hits
+    hits=$({
+        git log --format='%an <%ae>%n%B' "${range[@]}"
+        git log -p --no-color --format= "${range[@]}" | grep '^+'
+    } | grep -i -E -f <(grep -v -E '^(#|$)' "$patterns"))
+    [[ -z $hits ]] && return 0
+    printf 'pre-push: private names in this push:\n%s\n' "$hits" >&2
+    blocked=1
+}
+
+scan_secrets() {
+    gitleaks git --no-banner --redact --log-opts="$1 --not --remotes=$remote" </dev/null >&2 || blocked=1
+}
+
+[[ -s $patterns ]] || echo "pre-push: no $patterns, skipping the private name check" >&2
+command -v gitleaks >/dev/null || echo "pre-push: gitleaks not installed, skipping the secret check" >&2
+
+while read -r _ local_sha _ _; do
+    [[ $local_sha =~ ^0+$ ]] && continue
+    [[ -s $patterns ]] && scan_names "$local_sha"
+    command -v gitleaks >/dev/null && scan_secrets "$local_sha"
+done
+
+if [[ $blocked == 1 ]]; then
+    echo "pre-push: blocked. Fix the commits, or use --no-verify if it is a false match." >&2
+fi
+exit "$blocked"
