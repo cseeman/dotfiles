@@ -1,9 +1,12 @@
 # User Memory - Personal Preferences
 
+## Writing
+Applies to code, docs, PRs, tickets, and messages.
+- No emojis.
+- No em dashes (—) or double hyphens (--) as punctuation. Use commas, hyphens, or rephrase.
+
 ## Code Style
 - Prefer explicit over clever
-- No emojis in code or documentation
-- No em dashes (—) or double hyphens (--) as punctuation. Use commas, hyphens, or rephrase.
 - Minimize code comments. Comment only what the code cannot say: why this shape, what breaks without it, a constraint set elsewhere. Never restate the line.
 - Comment length: two lines is the target, four the ceiling. Past that, rename the code or move the explanation into the commit message or PR body.
 - One fact per comment. Cut the sentence that re-explains the previous one. No narrating rejected alternatives, no reassurance, no "note that".
@@ -25,8 +28,10 @@
 
 ## Pull Request Descriptions
 A PR description is not a changelog of the diff. Keep it short and focused.
-- Lead with WHY: the problem or motivation, in 1-2 sentences.
+- Lead with WHY: the problem or motivation, in 1-2 sentences. A stack's first PR uses the longer form below.
 - Business justification: 1-2 sentences on operational impact.
 - Do NOT enumerate everything that changed. The commits and diff carry the what.
 - Add technical notes only for context a reviewer cannot get from the diff: a non-obvious tradeoff, migration ordering, or a deliberately deferred follow-up.
 - Link the Linear ticket. Omit any section that has nothing to say.
+- In a stack, the first PR opens for a reader with no context: Background (a few short sentences on the project and the problem), How this fits (a numbered list with one line per PR, and what comes next), then a short This PR. If choices need checking, list them under "A few choices to check:" as a bold statement plus its reason. Later PRs can point back to the first.
+- Read a description through before posting: short sentences, no insider shorthand, and each sentence flows from the last.
