@@ -1,9 +1,12 @@
 # User Memory - Personal Preferences
 
+## Writing
+Applies to code, docs, PRs, tickets, and messages.
+- No emojis.
+- No em dashes (—) or double hyphens (--) as punctuation. Use commas, hyphens, or rephrase.
+
 ## Code Style
 - Prefer explicit over clever
-- No emojis in code or documentation
-- No em dashes (—) or double hyphens (--) as punctuation. Use commas, hyphens, or rephrase.
 - Minimize code comments. Comment only what the code cannot say: why this shape, what breaks without it, a constraint set elsewhere. Never restate the line.
 - Comment length: two lines is the target, four the ceiling. Past that, rename the code or move the explanation into the commit message or PR body.
 - One fact per comment. Cut the sentence that re-explains the previous one. No narrating rejected alternatives, no reassurance, no "note that".
