@@ -59,6 +59,7 @@ Rebasing a stack updates every branch above it (`rebase.updateRefs`), and
 | `pr-waiting` | Open PRs across your configured repos still waiting on you, oldest first |
 | `pr-waiting --all` | The same list unfiltered, the raw team queue |
 | `pr-rereview` | PRs you reviewed that may need another look |
+| `my-prs` | Your open and draft PRs with review decision and CI state |
 | `pr-surfaces` | Authored vs reviewed by month, and how much touched a decision surface |
 | `pr-surfaces --months 12` | A longer window |
 

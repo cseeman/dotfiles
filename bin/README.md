@@ -121,6 +121,16 @@ last review, most urgent first. `pr-rereview-notify` runs it on weekday mornings
 through the launch agent in `launchd/` and only notifies when something needs you.
 Pass an org, or set `PR_REREVIEW_ORG` in `~/.pr-tools.local`.
 
+## my-prs
+
+`my-prs` lists your open and draft PRs across an org, grouped by repo, with
+state, review decision, and CI (`green`, or the non-green conclusions with
+counts). `--raw` prints `|`-separated rows with dates and URLs instead, for the
+`my-prs` skill. Pass an org, or set `PR_REREVIEW_ORG` in `~/.pr-tools.local`. To
+track someone else's PR alongside yours, add `owner/repo#number` lines to
+`~/.my-prs-extras` (or the file named by `PR_MINE_EXTRAS`); each shows until it
+merges or closes.
+
 ## pr-surfaces
 
 `pr-surfaces` shows where your PR attention went across your configured repos,
