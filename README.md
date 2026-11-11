@@ -42,6 +42,9 @@ style, and Neovim's background to match. Details in `.config/tmux/THEMES.md`.
 - `alacritty/alacritty.toml` - Window, shell, and two pointer imports: theme and font
 - `alacritty/fonts/` - One file per font; `switch-font.sh <name>` picks one
 
+### Zed
+- `.config/zed/settings.json` - Vim mode, panels docked left, theme follows the system
+
 ### AI Workflow
 - `bin/dev-session` - One 2-pane tmux session per worktree: shell + Claude (docs in `bin/README.md`)
 - `bin/git-recent` - Recently active branches, sized to the terminal
@@ -80,7 +83,8 @@ cd ~/Documents/Repos/dotfiles
 The installer, in order:
 
 1. Symlinks every config into `$HOME`, moving anything it replaces to `~/.dotfiles-backup/<timestamp>/`.
-2. Runs `brew bundle` from the Brewfile (skip with `--no-brew`).
+2. Runs `brew bundle` from the Brewfile (skip with `--no-brew`). On a fresh
+   Mac, `--apps` also installs the desktop and App Store apps in `Brewfile.apps`.
 3. Clones tpm and installs the tmux plugins.
 4. Clones the alacritty-theme collection.
 5. Sets the default tmux theme (equinox-dawn) and Alacritty font (Maple) if none is active.
