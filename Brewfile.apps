@@ -25,7 +25,6 @@ cask "notion-calendar"
 cask "zoom"
 cask "loom"
 cask "tuple"
-cask "superwhisper"
 
 # Everyday
 cask "1password"
