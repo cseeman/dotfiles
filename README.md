@@ -42,6 +42,9 @@ style, and Neovim's background to match. Details in `.config/tmux/THEMES.md`.
 - `alacritty/alacritty.toml` - Window, shell, and two pointer imports: theme and font
 - `alacritty/fonts/` - One file per font; `switch-font.sh <name>` picks one
 
+### Zed
+- `.config/zed/settings.json` - Vim mode, panels docked left, theme follows the system
+
 ### AI Workflow
 - `bin/dev-session` - One 2-pane tmux session per worktree: shell + Claude (docs in `bin/README.md`)
 - `bin/git-recent` - Recently active branches, sized to the terminal

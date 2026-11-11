@@ -35,6 +35,7 @@ LINKS="
 .config/tmux|$HOME/.config/tmux
 .config/nvim|$HOME/.config/nvim
 .config/starship.toml|$HOME/.config/starship.toml
+.config/zed/settings.json|$HOME/.config/zed/settings.json
 .config/glow/glow.yml|$HOME/Library/Preferences/glow/glow.yml
 alacritty/alacritty.toml|$HOME/.config/alacritty/alacritty.toml
 .claude/CLAUDE.md|$HOME/.claude/CLAUDE.md
