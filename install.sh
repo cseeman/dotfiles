@@ -20,6 +20,7 @@ readonly LAUNCH_AGENT="com.christine.pr-rereview"
 
 DRY_RUN=0
 WITH_BREW=1
+WITH_APPS=0
 
 # repo path|target path. One line per link; directories link as a whole.
 LINKS="
@@ -44,10 +45,11 @@ bin|$HOME/bin
 
 usage() {
     cat <<USAGE
-Usage: ${0##*/} [--dry-run] [--no-brew]
+Usage: ${0##*/} [--dry-run] [--no-brew] [--apps]
 
   --dry-run   print what would change without touching anything
   --no-brew   skip 'brew bundle'
+  --apps      also install the desktop apps in Brewfile.apps (fresh Mac)
 USAGE
 }
 
@@ -105,6 +107,15 @@ install_brew() {
         return 0
     fi
     run brew bundle --file "$DOTFILES/Brewfile" --no-upgrade
+}
+
+install_apps() {
+    printf '\nDesktop apps\n'
+    if ! command -v brew >/dev/null 2>&1; then
+        log "skip" "brew not found"
+        return 0
+    fi
+    run brew bundle --file "$DOTFILES/Brewfile.apps" --no-upgrade
 }
 
 install_tmux_plugins() {
@@ -193,6 +204,7 @@ main() {
         case $1 in
             -n|--dry-run) DRY_RUN=1 ;;
             --no-brew)    WITH_BREW=0 ;;
+            --apps)       WITH_APPS=1 ;;
             -h|--help)    usage; return 0 ;;
             *)            usage >&2; return 1 ;;
         esac
@@ -203,6 +215,7 @@ main() {
     seed_generated
     link_all
     [[ $WITH_BREW == 1 ]] && install_brew
+    [[ $WITH_APPS == 1 ]] && install_apps
     install_tmux_plugins
     install_alacritty_themes
     select_theme

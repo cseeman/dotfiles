@@ -1,0 +1,49 @@
+# Desktop apps for a fresh Mac. Install with: ./install.sh --apps
+# Kept apart from Brewfile because a cask fails the bundle when its app is
+# already in /Applications, which would break re-running install.sh.
+# Company-managed apps (SentinelOne, Rippling) come from IT, not here.
+
+# Terminals and editors (Alacritty is installed by hand; its cask is disabled)
+cask "ghostty"
+cask "iterm2"
+cask "zed"
+cask "visual-studio-code"
+cask "cursor"
+
+# AI and dev tools
+cask "claude"
+cask "docker-desktop"
+cask "postico"
+cask "insomnia"
+cask "git-credential-manager"
+
+# Work
+cask "slack"
+cask "linear"
+cask "notion"
+cask "notion-calendar"
+cask "zoom"
+cask "loom"
+cask "tuple"
+cask "superwhisper"
+
+# Everyday
+cask "1password"
+cask "1password-cli"
+cask "bitwarden"
+cask "google-drive"
+cask "google-chrome"
+cask "firefox"
+cask "rectangle"
+cask "discord"
+cask "sonic-pi"
+
+# App Store (sign in to the App Store first)
+mas "1Password for Safari", id: 1569813296
+mas "Notion Web Clipper", id: 1559269364
+mas "Keynote", id: 409183694
+mas "Keynote Creator Studio", id: 361285480
+mas "Numbers", id: 409203825
+mas "Pages", id: 409201541
+mas "GarageBand", id: 682658836
+mas "iMovie", id: 408981434

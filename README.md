@@ -80,7 +80,8 @@ cd ~/Documents/Repos/dotfiles
 The installer, in order:
 
 1. Symlinks every config into `$HOME`, moving anything it replaces to `~/.dotfiles-backup/<timestamp>/`.
-2. Runs `brew bundle` from the Brewfile (skip with `--no-brew`).
+2. Runs `brew bundle` from the Brewfile (skip with `--no-brew`). On a fresh
+   Mac, `--apps` also installs the desktop and App Store apps in `Brewfile.apps`.
 3. Clones tpm and installs the tmux plugins.
 4. Clones the alacritty-theme collection.
 5. Sets the default tmux theme (equinox-dawn) and Alacritty font (Maple) if none is active.
