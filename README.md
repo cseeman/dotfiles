@@ -110,4 +110,4 @@ server, and starts Neovim headless. Run it before committing.
 
 ---
 
-Opinionated and personal. Your mileage may vary. If you spot something wrong, let me know, Rails devs gotta stick together.
+Opinionated and personal. Your mileage may vary. If you spot something wrong, let me know.
