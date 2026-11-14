@@ -112,8 +112,8 @@ Re-running is safe; links already in place are skipped.
 
 Machine-specific settings stay out of the repo: `~/.bashrc.local`,
 `~/.zshrc.local`, and `~/.gitconfig.local` are sourced or included when
-present. Set `user.email` in `~/.gitconfig.local`. `~/.pr-tools.local` holds the repos the PR scripts query, see
-`bin/README.md`.
+present. Set `user.email` in `~/.gitconfig.local`. `~/.pr-tools.local` holds
+the repos the PR scripts query; `bin/README.md` has the format.
 
 Private GitHub gems need a classic PAT with only `read:packages`, stored once:
 `bundle config set --global rubygems.pkg.github.com <login>:<pat>`.
