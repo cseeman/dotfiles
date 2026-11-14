@@ -71,6 +71,22 @@ in glow from any shell.
 
 Claude handles editing, git, tests, and codebase exploration directly. The shell is for servers, migrations, and anything needing direct control.
 
+## New Mac
+
+The full restore order, keys first, lives in `RESTORE.md` in my private
+claude-config repo. From this repo's side:
+
+- Install the Xcode Command Line Tools and Homebrew before `install.sh`. Without
+  brew it skips the Brewfile, and the tmux and Neovim steps quietly do nothing.
+- Import the GPG signing key before the first commit. `.gitconfig` turns
+  signing on, so every commit fails without it.
+- Clone to `~/Documents/Repos/dotfiles` exactly. The `cheat` alias expects it.
+- Run `install.sh --apps`, then `mise install` for the versions in `.tool-versions`.
+- Make Homebrew bash the login shell, which the installer does not do:
+  `echo /opt/homebrew/bin/bash | sudo tee -a /etc/shells && chsh -s /opt/homebrew/bin/bash`
+- Restore `~/.gitconfig.local`, `~/.pr-tools.local`, and
+  `~/.dotfiles-private-patterns`. Nothing here can rebuild them.
+
 ## Quick Start
 
 ```bash
